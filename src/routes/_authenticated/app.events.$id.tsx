@@ -530,9 +530,6 @@ function EventAdminPage() {
             Descargar lista
           </Button>
         </StatCard>
-      </div>
-
-      <div className="mt-4 max-w-sm">
         <StatCard
           icon={Users}
           label="Mesas"

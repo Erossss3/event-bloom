@@ -66,28 +66,46 @@ function EventAdminPage() {
           0
         ),
 
-        vegetarian: confirmedRows.filter((r) =>
-          Array.isArray(r.dietary_items) &&
-          r.dietary_items.some((item: any) =>
-            item.name?.toLowerCase().includes("vegetar")
-          )
-        ).length,
+        vegetarian: confirmedRows.reduce((total, r) => {
+          if (!Array.isArray(r.dietary_items)) return total;
 
-        vegan: confirmedRows.filter((r) =>
-          Array.isArray(r.dietary_items) &&
-          r.dietary_items.some((item: any) =>
-            item.name?.toLowerCase().includes("vegano")
-          )
-        ).length,
+          return total + r.dietary_items
+            .filter((item: any) =>
+              item.name?.toLowerCase().includes("vegetar")
+            )
+            .reduce((sum: number, item: any) =>
+              sum + (item.quantity ?? 0), 0
+            );
 
-        glutenFree: confirmedRows.filter((r) =>
-          Array.isArray(r.dietary_items) &&
-          r.dietary_items.some((item: any) =>
-            item.name?.toLowerCase().includes("tacc") ||
-            item.name?.toLowerCase().includes("celiac") ||
-            item.name?.toLowerCase().includes("gluten")
-          )
-        ).length,
+        }, 0),
+
+        vegan: confirmedRows.reduce((total, r) => {
+          if (!Array.isArray(r.dietary_items)) return total;
+
+          return total + r.dietary_items
+            .filter((item: any) =>
+              item.name?.toLowerCase().includes("vegano")
+            )
+            .reduce((sum: number, item: any) =>
+              sum + (item.quantity ?? 0), 0
+            );
+
+        }, 0),
+
+        glutenFree: confirmedRows.reduce((total, r) => {
+          if (!Array.isArray(r.dietary_items)) return total;
+
+          return total + r.dietary_items
+            .filter((item: any) =>
+              item.name?.toLowerCase().includes("tacc") ||
+              item.name?.toLowerCase().includes("celiac") ||
+              item.name?.toLowerCase().includes("gluten")
+            )
+            .reduce((sum: number, item: any) =>
+              sum + (item.quantity ?? 0), 0
+            );
+
+        }, 0),
 
         otherRestrictions: confirmedRows.filter((r) =>
           Array.isArray(r.dietary_items) &&

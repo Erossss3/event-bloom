@@ -213,34 +213,96 @@ function EventAdminPage() {
 
       const doc = new jsPDF();
 
+      // Título
       doc.setFontSize(18);
       doc.text(
-        `Confirmaciones - ${event?.title ?? "Evento"}`,
+        "LiveMoments - Confirmaciones",
         14,
         20
       );
 
-      doc.setFontSize(11);
+      doc.setFontSize(14);
       doc.text(
-        `Total confirmados: ${confirmedGuests.length}`,
+        event?.title ?? "Evento",
         14,
         30
       );
 
+      // Datos generales
+      doc.setFontSize(11);
+
+      doc.text(
+        `Confirmados: ${stats?.cateringStats?.confirmed ?? 0}`,
+        14,
+        42
+      );
+
+      doc.text(
+        `Adultos: ${stats?.cateringStats?.adults ?? 0}`,
+        14,
+        50
+      );
+
+      doc.text(
+        `Niños: ${stats?.cateringStats?.children ?? 0}`,
+        14,
+        58
+      );
+
+
+      // Resumen catering
+      doc.setFontSize(13);
+
+      doc.text(
+        "Resumen catering",
+        14,
+        72
+      );
+
+      doc.setFontSize(11);
+
+      doc.text(
+        `Vegetarianos: ${stats?.cateringStats?.vegetarian ?? 0}`,
+        14,
+        82
+      );
+
+      doc.text(
+        `Veganos: ${stats?.cateringStats?.vegan ?? 0}`,
+        14,
+        90
+      );
+
+      doc.text(
+        `Sin TACC: ${stats?.cateringStats?.glutenFree ?? 0}`,
+        14,
+        98
+      );
+
+      doc.text(
+        `Otras restricciones: ${stats?.cateringStats?.otherRestrictions ?? 0}`,
+        14,
+        106
+      );
+
       autoTable(doc, {
-        startY: 40,
+        startY: 120,
         head: [
           [
             "Nombre",
+            "Estado",
             "Adultos",
             "Niños",
             "Restricciones"
           ]
         ],
+
         body: confirmedGuests.map((rsvp) => [
           rsvp.full_name,
+          rsvp.status,
           rsvp.adults ?? 0,
           rsvp.children ?? 0,
+
           Array.isArray(rsvp.dietary_items)
             ? rsvp.dietary_items
                 .map((item: any) =>

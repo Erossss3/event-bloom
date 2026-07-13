@@ -172,7 +172,7 @@ function EventAdminPage() {
                     title={`${event.title}-evento`}
                   />
                 ) : (
-                   <div className="rounded-2xl border bg-muted/30 p-8 text-center">
+                  <div className="rounded-2xl border bg-muted/30 p-8 text-center">
                     <p className="font-medium">
                       La experiencia del evento estará disponible 20 minutos antes de comenzar.
                     </p>
@@ -181,6 +181,7 @@ function EventAdminPage() {
                     </p>
                   </div>
                 )}
+              </div>
               </div>
 
               <AlertDialogFooter>

@@ -441,6 +441,62 @@ function EventAdminPage() {
       </div>
 
       <section className="rounded-3xl border bg-card p-6 shadow-soft">
+        <h2 className="font-display text-2xl">
+          🍽️ Resumen para catering
+        </h2>
+
+        <p className="text-sm text-muted-foreground">
+          Cantidades calculadas automáticamente según las confirmaciones.
+        </p>
+
+        <div className="mt-6 grid gap-4 md:grid-cols-4">
+
+          <StatCard
+            icon={Users}
+            label="Confirmados"
+            value={stats?.cateringStats?.confirmed ?? 0}
+          />
+
+          <StatCard
+            icon={Users}
+            label="Adultos"
+            value={stats?.cateringStats?.adults ?? 0}
+          />
+
+          <StatCard
+            icon={Users}
+            label="Niños"
+            value={stats?.cateringStats?.children ?? 0}
+          />
+
+          <StatCard
+            icon={Sparkles}
+            label="Vegetarianos"
+            value={stats?.cateringStats?.vegetarian ?? 0}
+          />
+
+          <StatCard
+            icon={Sparkles}
+            label="Veganos"
+            value={stats?.cateringStats?.vegan ?? 0}
+          />
+
+          <StatCard
+            icon={CheckCircle2}
+            label="Sin TACC"
+            value={stats?.cateringStats?.glutenFree ?? 0}
+          />
+
+          <StatCard
+            icon={MessageCircle}
+            label="Otras restricciones"
+            value={stats?.cateringStats?.otherRestrictions ?? 0}
+          />
+
+        </div>
+      </section>
+
+      <section className="rounded-3xl border bg-card p-6 shadow-soft">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="font-display text-2xl inline-flex items-center gap-2"><Film className="h-5 w-5 text-gold" /> Video resumen</h2>

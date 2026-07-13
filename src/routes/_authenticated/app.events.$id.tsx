@@ -42,17 +42,65 @@ function EventAdminPage() {
         supabase.from("guests").select("id", { count: "exact", head: true }).eq("event_id", id),
         supabase.from("gallery").select("id", { count: "exact", head: true }).eq("event_id", id),
         supabase.from("messages").select("id", { count: "exact", head: true }).eq("event_id", id),
-        supabase.from("rsvps").select("status").eq("event_id", id),
+        supabase.from("rsvps").select(`status, adults, children, dietary_items`).eq("event_id", id),
         supabase.from("event_visits").select("id", { count: "exact", head: true }).eq("event_id", id),
       ]);
       const rsvpRows = rsvps.data ?? [];
+
+      const confirmedRows = rsvpRows.filter(
+        (r) => r.status === "confirmed"
+      );
+
+      const cateringStats = {
+        confirmed: confirmedRows.length,
+
+        adults: confirmedRows.reduce(
+          (sum, r) => sum + (r.adults ?? 0),
+          0
+        ),
+
+        children: confirmedRows.reduce(
+          (sum, r) => sum + (r.children ?? 0),
+          0
+        ),
+
+        vegetarian: confirmedRows.filter((r) =>
+          Array.isArray(r.dietary_items) &&
+          r.dietary_items.some((item: any) =>
+            item.name?.toLowerCase().includes("vegetar")
+          )
+        ).length,
+
+        vegan: confirmedRows.filter((r) =>
+          Array.isArray(r.dietary_items) &&
+          r.dietary_items.some((item: any) =>
+            item.name?.toLowerCase().includes("vegano")
+          )
+        ).length,
+
+        glutenFree: confirmedRows.filter((r) =>
+          Array.isArray(r.dietary_items) &&
+          r.dietary_items.some((item: any) =>
+            item.name?.toLowerCase().includes("tacc") ||
+            item.name?.toLowerCase().includes("celiac") ||
+            item.name?.toLowerCase().includes("gluten")
+          )
+        ).length,
+
+        otherRestrictions: confirmedRows.filter((r) =>
+          Array.isArray(r.dietary_items) &&
+          r.dietary_items.length > 0
+        ).length,
+      };
+
       return {
         guests: guests.count ?? 0,
         gallery: gallery.count ?? 0,
         messages: messages.count ?? 0,
         visits: visits.count ?? 0,
-        confirmed: rsvpRows.filter(r => r.status === "confirmed").length,
+        confirmed: confirmedRows.length,
         declined: rsvpRows.filter(r => r.status === "declined").length,
+        cateringStats,
       };
     },
     refetchInterval: 15_000,

@@ -7,6 +7,7 @@ import { GuestJoinDialog } from "@/components/GuestJoinDialog";
 import { Calendar, Camera, Heart, Home, MapPin, MessageCircle, Sparkles } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { LiveLockDialog } from "@/components/LiveLockDialog";
 
 export const Route = createFileRoute("/e/$slug")({
   loader: async ({ params }) => {
@@ -31,6 +32,11 @@ export const Route = createFileRoute("/e/$slug")({
 function EventLayout() {
   const { slug } = useParams({ from: "/e/$slug" });
   const { event } = Route.useLoaderData();
+  const unlockAt = new Date(
+    new Date(event.starts_at).getTime() - 20 * 60 * 1000
+  );
+
+  const liveLocked = new Date() < unlockAt;
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [joinOpen, setJoinOpen] = useState(false);
   const [guestLoaded, setGuestLoaded] = useState(false);
@@ -62,7 +68,7 @@ function EventLayout() {
   ];
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="relative min-h-screen bg-background pb-24">
       <div className="relative h-72 overflow-hidden md:h-96">
         {event.cover_url
           ? <img src={event.cover_url} alt="" className="h-full w-full object-cover" />
@@ -95,8 +101,12 @@ function EventLayout() {
       <div className="mx-auto max-w-4xl px-6 py-8">
         <Outlet />
       </div>
-
       <GuestJoinDialog open={joinOpen} onOpenChange={setJoinOpen} eventId={event.id} eventTitle={event.title} />
-    </div>
-  );
-}
+
+      <LiveLockDialog
+        open={liveLocked}
+        target={unlockAt.toISOString()}
+      />
+      
+      </div>
+  )}

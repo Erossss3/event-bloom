@@ -264,7 +264,7 @@ function EventAdminPage() {
                variant="destructive"
                 className="rounded-full bg-gradient-gold text-primary-foreground"
               >
-                Eliminar evento
+                 Eliminar evento
               </Button>
             </AlertDialogTrigger>
 

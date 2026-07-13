@@ -14,6 +14,7 @@ interface GalleryItem { id: string; public_url: string; caption: string | null }
 interface MessageItem { id: string; author_name: string; body: string; emoji: string | null }
 
 function LivePage() {
+  console.log("Estoy en live");
   const { id } = useParams({ from: "/_authenticated/app/events/$id/live" });
 
   const { data: event } = useQuery({

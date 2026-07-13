@@ -13,7 +13,8 @@ import { toast } from "sonner";
 import JSZip from "jszip";
 import { QRPanel } from "@/components/QRPanel";
 import { publicEventUrl, publicRsvpUrl } from "@/lib/public-url";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
+import * as XLSX from "xlsx";
 
 export const Route = createFileRoute("/_authenticated/app/events/$id")({
   head: () => ({ meta: [{ title: "Evento — LiveMoments" }] }),
@@ -166,6 +167,57 @@ function EventAdminPage() {
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Error");
     } finally { setZipping(false); }
+  }
+
+  async function downloadConfirmationsExcel() {
+    try {
+      const confirmedGuests = rsvps?.filter(
+        (r) => r.status === "confirmed"
+      );
+
+      if (!confirmedGuests || confirmedGuests.length === 0) {
+        toast.error("No hay confirmaciones para descargar");
+        return;
+      }
+
+      const rows = confirmedGuests.map((rsvp) => ({
+        Nombre: rsvp.full_name,
+        Estado: rsvp.status,
+        Adultos: rsvp.adults ?? 0,
+        Niños: rsvp.children ?? 0,
+        Restricciones: Array.isArray(rsvp.dietary_items)
+          ? rsvp.dietary_items
+              .map((item: any) => `${item.name} x${item.quantity}`)
+              .join(", ")
+          : "",
+        Comentarios: "",
+        Mesa: "",
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(rows);
+
+      const workbook = XLSX.utils.book_new();
+
+      XLSX.utils.book_append_sheet(
+        workbook,
+        worksheet,
+        "Confirmaciones"
+      );
+
+      XLSX.writeFile(
+        workbook,
+        `${event?.slug ?? "evento"}-confirmaciones.xlsx`
+      );
+
+      toast.success("Excel generado correctamente");
+
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Error generando Excel"
+      );
+    }
   }
 
   async function deleteEvent() {
@@ -327,7 +379,7 @@ function EventAdminPage() {
 
                  <br /><br />
 
-                  • Invitados<br />
+                 • Invitados<br />
                  • Confirmaciones<br />
                  • Fotos y videos<br />
                  • Mensajes<br />
@@ -360,7 +412,16 @@ function EventAdminPage() {
         <StatCard icon={Users} label="Invitados" value={stats?.guests ?? 0} />
         <StatCard icon={Camera} label="Fotos & videos" value={stats?.gallery ?? 0} />
         <StatCard icon={MessageCircle} label="Mensajes" value={stats?.messages ?? 0} />
-        <StatCard icon={Sparkles} label="Confirmados" value={stats?.confirmed ?? 0} sub={`${stats?.declined ?? 0} no asisten`} />
+        <StatCard 
+          icon={Sparkles} 
+          label="Confirmados" 
+          value={stats?.confirmed ?? 0} 
+          sub={`${stats?.declined ?? 0} no asisten`}
+        >
+          <Button variant="outline" size="sm" className="mt-3 rounded-full">
+            Descargar lista
+          </Button>
+        </StatCard>
       </div>
 
       <section className="rounded-3xl border bg-card p-6 shadow-soft">
@@ -388,84 +449,38 @@ function EventAdminPage() {
       </section>
 
       <section className="rounded-3xl border bg-card p-6 shadow-soft">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <h2 className="font-display text-2xl">
-                Confirmaciones
-              </h2>
+        <h2 className="font-display text-2xl">
+          Galería
+        </h2>
 
-              <p className="text-sm text-muted-foreground">
-                Información para organización y catering.
-              </p>
-            </div>
+        <p className="text-sm text-muted-foreground">
+          Moderá y destacá fotos para el slideshow.
+        </p>
 
-            <Button variant="outline">
-              Descargar lista
-            </Button>
-          </div>
-
-
-          <div className="mt-6 space-y-4">
-
-            {rsvps
-              ?.filter((r) => r.status === "confirmed")
-              .map((rsvp) => (
-                <div
-                  key={rsvp.id}
-                  className="rounded-2xl border p-4"
-                >
-                  <h3 className="font-semibold">
-                    {rsvp.full_name}
-                  </h3>
-
-                  <p className="text-sm text-muted-foreground">
-                    {rsvp.adults} adultos · {rsvp.children} niños
-                  </p>
-
-                  {Array.isArray(rsvp.dietary_items) &&
-                    rsvp.dietary_items.length > 0 && (
-                    <div className="mt-2 text-sm">
-                      <p className="font-medium">
-                        Restricciones:
-                      </p>
-
-                      {(rsvp.dietary_items as { name: string; quantity: number }[])
-                        .map((item, i) => (
-                          <div key={i}>
-                            {item.name} x{item.quantity}
-                          </div>
-                        ))
-                      }
-                    </div>
-                  )}
-
-                </div>
-              ))}
-
-          </div>
-        <h2 className="font-display text-2xl">Galería</h2>
-        <p className="text-sm text-muted-foreground">Moderá y destacá fotos para el slideshow.</p>
-        <div className="mt-6"><AdminGallery eventId={id} /></div>
-      </section>
-
-      <section className="rounded-3xl border bg-card p-6 shadow-soft">
-        <h2 className="font-display text-2xl">Mensajes</h2>
-        <p className="text-sm text-muted-foreground">Destacalos para la pantalla en vivo o eliminalos.</p>
-        <div className="mt-6"><AdminMessages eventId={id} /></div>
+        <div className="mt-6">
+          <AdminGallery eventId={id} />
+        </div>
       </section>
 
     </div>
   );
 }
 
-function StatCard({ icon: Icon, label, value, sub }: { icon: React.ComponentType<{ className?: string }>; label: string; value: number; sub?: string }) {
+function StatCard({ icon: Icon, label, value, sub, children }: { icon: React.ComponentType<{ className?: string }>; label: string; value: number; sub?: string; children?: ReactNode; }) {
   return (
     <div className="rounded-2xl border bg-card p-5 shadow-soft">
       <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-muted-foreground">
         <Icon className="h-4 w-4" /> {label}
       </div>
       <div className="mt-2 font-display text-3xl">{value}</div>
-      {sub && <div className="text-xs text-muted-foreground">{sub}</div>}
+      {sub && (
+        <div className="text-xs text-muted-foreground">
+          {sub}
+        </div>
+      )}
+
+      {children}
+
     </div>
   );
 }

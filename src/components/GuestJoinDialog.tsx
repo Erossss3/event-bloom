@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { generateDeviceToken, saveGuest, getGuest } from "@/lib/guest-identity";
-import { uploadToBucket } from "@/lib/storage";
 import { toast } from "sonner";
 
 export function GuestJoinDialog({
@@ -13,7 +12,6 @@ export function GuestJoinDialog({
 }: { open: boolean; onOpenChange: (o: boolean) => void; eventId: string; eventTitle: string }) {
   const [first, setFirst] = useState("");
   const [last, setLast] = useState("");
-  const [avatar, setAvatar] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
 
   async function join(e: React.FormEvent) {
@@ -23,12 +21,6 @@ export function GuestJoinDialog({
       const existing = getGuest(eventId);
       const token = existing?.deviceToken ?? generateDeviceToken();
       let avatarUrl: string | undefined;
-      if (avatar) {
-        const ext = avatar.name.split(".").pop();
-        const path = `${eventId}/${token}.${ext}`;
-        const { url } = await uploadToBucket("avatars", path, avatar);
-        avatarUrl = url;
-      }
       const { data, error } = await supabase.from("guests")
         .upsert({
           event_id: eventId, device_token: token,
@@ -39,7 +31,7 @@ export function GuestJoinDialog({
       if (error) throw error;
       saveGuest(eventId, {
         guestId: data.id, deviceToken: token,
-        firstName: first.trim(), lastName: last.trim() || undefined, avatarUrl,
+        firstName: first.trim(), lastName: last.trim() || undefined,
       });
       toast.success(`¡Bienvenido/a a ${eventTitle}!`);
       onOpenChange(false);
@@ -65,10 +57,6 @@ export function GuestJoinDialog({
           <div>
             <Label htmlFor="last">Apellido <span className="text-muted-foreground">(opcional)</span></Label>
             <Input id="last" value={last} onChange={(e) => setLast(e.target.value)} />
-          </div>
-          <div>
-            <Label htmlFor="ava">Foto <span className="text-muted-foreground">(opcional)</span></Label>
-            <Input id="ava" type="file" accept="image/*" onChange={(e) => setAvatar(e.target.files?.[0] ?? null)} />
           </div>
           <Button type="submit" disabled={saving || first.trim().length === 0} className="w-full rounded-full bg-gradient-gold text-primary-foreground">
             {saving ? "Un momento…" : "Unirme"}

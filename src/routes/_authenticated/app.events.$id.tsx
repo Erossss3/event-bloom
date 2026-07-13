@@ -310,7 +310,6 @@ function EventAdminPage() {
                     {rsvp.adults} adultos · {rsvp.children} niños
                   </p>
 
-                  id="6wz5j4"
                   {Array.isArray(rsvp.dietary_items) &&
                     rsvp.dietary_items.length > 0 && (
                     <div className="mt-2 text-sm">

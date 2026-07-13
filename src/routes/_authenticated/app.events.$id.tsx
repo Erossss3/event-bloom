@@ -418,7 +418,7 @@ function EventAdminPage() {
           value={stats?.confirmed ?? 0} 
           sub={`${stats?.declined ?? 0} no asisten`}
         >
-          <Button variant="outline" size="sm" className="mt-3 rounded-full">
+          <Button variant="outline" size="sm" className="mt-3 rounded-full" onClick={downloadConfirmationsExcel}>
             Descargar lista
           </Button>
         </StatCard>

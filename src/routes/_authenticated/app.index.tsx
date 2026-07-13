@@ -89,7 +89,11 @@ function DashboardPage() {
                 <Link to="/e/$slug" params={{ slug: e.slug }} className="inline-flex items-center gap-1 rounded-full border px-4 py-1.5 text-xs">
                   <Users className="h-3 w-3" /> Página pública
                 </Link>
-                <Link to="/app/events/$id/qr" params={{ id: e.id }} className="inline-flex items-center gap-1 rounded-full border px-4 py-1.5 text-xs">
+                <Link
+                  to="/app/events/$id" 
+                  params={{ id: e.id }}
+                  className="inline-flex items-center gap-1 rounded-full border px-4 py-1.5 text-xs"
+                >
                   <QrCode className="h-3 w-3" /> QR
                 </Link>
               </div>

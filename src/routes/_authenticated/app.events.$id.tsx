@@ -14,7 +14,8 @@ import JSZip from "jszip";
 import { QRPanel } from "@/components/QRPanel";
 import { publicEventUrl, publicRsvpUrl } from "@/lib/public-url";
 import { useState, type ReactNode } from "react";
-import * as XLSX from "xlsx";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 export const Route = createFileRoute("/_authenticated/app/events/$id")({
   head: () => ({ meta: [{ title: "Evento — LiveMoments" }] }),
@@ -169,7 +170,7 @@ function EventAdminPage() {
     } finally { setZipping(false); }
   }
 
-  async function downloadConfirmationsExcel() {
+  function downloadConfirmationsPDF() {
     try {
       const confirmedGuests = rsvps?.filter(
         (r) => r.status === "confirmed"
@@ -180,42 +181,57 @@ function EventAdminPage() {
         return;
       }
 
-      const rows = confirmedGuests.map((rsvp) => ({
-        Nombre: rsvp.full_name,
-        Estado: rsvp.status,
-        Adultos: rsvp.adults ?? 0,
-        Niños: rsvp.children ?? 0,
-        Restricciones: Array.isArray(rsvp.dietary_items)
-          ? rsvp.dietary_items
-              .map((item: any) => `${item.name} x${item.quantity}`)
-              .join(", ")
-          : "",
-        Comentarios: "",
-        Mesa: "",
-      }));
+      const doc = new jsPDF();
 
-      const worksheet = XLSX.utils.json_to_sheet(rows);
-
-      const workbook = XLSX.utils.book_new();
-
-      XLSX.utils.book_append_sheet(
-        workbook,
-        worksheet,
-        "Confirmaciones"
+      doc.setFontSize(18);
+      doc.text(
+        `Confirmaciones - ${event?.title ?? "Evento"}`,
+        14,
+        20
       );
 
-      XLSX.writeFile(
-        workbook,
-        `${event?.slug ?? "evento"}-confirmaciones.xlsx`
+      doc.setFontSize(11);
+      doc.text(
+        `Total confirmados: ${confirmedGuests.length}`,
+        14,
+        30
       );
 
-      toast.success("Excel generado correctamente");
+      autoTable(doc, {
+        startY: 40,
+        head: [
+          [
+            "Nombre",
+            "Adultos",
+            "Niños",
+            "Restricciones"
+          ]
+        ],
+        body: confirmedGuests.map((rsvp) => [
+          rsvp.full_name,
+          rsvp.adults ?? 0,
+          rsvp.children ?? 0,
+          Array.isArray(rsvp.dietary_items)
+            ? rsvp.dietary_items
+                .map((item: any) =>
+                  `${item.name} x${item.quantity}`
+                )
+                .join(", ")
+            : "",
+        ]),
+      });
+
+      doc.save(
+        `${event?.slug ?? "evento"}-confirmaciones.pdf`
+      );
+
+      toast.success("PDF generado correctamente");
 
     } catch (error) {
       toast.error(
         error instanceof Error
           ? error.message
-          : "Error generando Excel"
+          : "Error generando PDF"
       );
     }
   }
@@ -418,7 +434,7 @@ function EventAdminPage() {
           value={stats?.confirmed ?? 0} 
           sub={`${stats?.declined ?? 0} no asisten`}
         >
-          <Button variant="outline" size="sm" className="mt-3 rounded-full" onClick={downloadConfirmationsExcel}>
+          <Button variant="outline" size="sm" className="mt-3 rounded-full" onClick={downloadConfirmationsPDF}>
             Descargar lista
           </Button>
         </StatCard>

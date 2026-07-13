@@ -3,7 +3,7 @@
  * Usamos el dominio estable `project--<uuid>.lovable.app` que sirve la última publicación.
  */
 const PROJECT_ID = "61a1528e-8aad-40ae-8862-4c73b8e99108";
-export const PUBLIC_BASE_URL = `https://project--${PROJECT_ID}.lovable.app`;
+export const PUBLIC_BASE_URL = "https://livemoments-ruddy.vercel.app";
 
 export function publicEventUrl(slug: string) {
   return `${PUBLIC_BASE_URL}/e/${slug}`;

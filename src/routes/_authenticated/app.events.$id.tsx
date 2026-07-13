@@ -110,11 +110,6 @@ function EventAdminPage() {
   const eventUrl = publicEventUrl(event.slug);
   const rsvpUrl = publicRsvpUrl(event.slug);
 
-  const liveAvailableAt = new Date(
-    new Date(event.starts_at).getTime() - 20 * 60 * 1000
-  );
-
-  const liveEnabled = new Date() >= liveAvailableAt;
   return (
     <div className="space-y-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
@@ -166,21 +161,10 @@ function EventAdminPage() {
                     📸 Experiencia del evento
                   </h3>
 
-                {liveEnabled ? (
-                  <QRPanel
-                    url={eventUrl}
-                    title={`${event.title}-evento`}
-                  />
-                ) : (
-                  <div className="rounded-2xl border bg-muted/30 p-8 text-center">
-                    <p className="font-medium">
-                      La experiencia del evento estará disponible 20 minutos antes de comenzar.
-                    </p>
-                    <p className="mt-2 text-sm text-muted-foreground">
-                      El QR se habilitará automáticamente.
-                    </p>
-                  </div>
-                )}
+                <QRPanel
+                  url={eventUrl}
+                  title={`${event.title}-evento`}
+                />
               </div>
               </div>
 

@@ -107,10 +107,22 @@ function EventAdminPage() {
 
         }, 0),
 
-        otherRestrictions: confirmedRows.filter((r) =>
-          Array.isArray(r.dietary_items) &&
-          r.dietary_items.length > 0
-        ).length,
+        otherRestrictions: confirmedRows.reduce((total, r) => {
+          if (!Array.isArray(r.dietary_items)) return total;
+
+          return total + r.dietary_items
+            .filter((item: any) =>
+              !item.name?.toLowerCase().includes("vegetar") &&
+              !item.name?.toLowerCase().includes("vegano") &&
+              !item.name?.toLowerCase().includes("tacc") &&
+              !item.name?.toLowerCase().includes("celiac") &&
+              !item.name?.toLowerCase().includes("gluten")
+            )
+            .reduce((sum: number, item: any) =>
+              sum + (item.quantity ?? 0), 0
+            );
+
+        }, 0),
       };
 
       return {

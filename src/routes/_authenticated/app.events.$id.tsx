@@ -130,7 +130,7 @@ function EventAdminPage() {
  
      toast.success("Evento eliminado");
  
-     window.location.href = "/app/events";
+     window.location.href = "/app";
    } catch (err) {
      toast.error(err instanceof Error ? err.message : "Error al eliminar el evento");
    }
@@ -262,7 +262,7 @@ function EventAdminPage() {
             <AlertDialogTrigger asChild>
               <Button
                variant="destructive"
-                className="rounded-full"
+                className="rounded-full bg-gradient-gold text-primary-foreground"
               >
                 Eliminar evento
               </Button>

@@ -20,8 +20,8 @@ function RsvpPage() {
   const { event } = layoutApi.useLoaderData();
   const [status, setStatus] = useState<"confirmed" | "declined">("confirmed");
   const [full_name, setName] = useState("");
-  const [adults, setAdults] = useState(1);
-  const [children, setChildren] = useState(0);
+  const [adults, setAdults] = useState("1");
+  const [children, setChildren] = useState("0");
   const [dietary, setDietary] = useState("");
   const [dietaryItems, setDietaryItems] = useState<
     { name: string; quantity: number }[]
@@ -43,7 +43,7 @@ function RsvpPage() {
           if (data) {
             setExistingId(data.id);
             setStatus(data.status as "confirmed" | "declined");
-            setAdults(data.adults); setChildren(data.children);
+            setAdults(String(data.adults)); setChildren(String(data.children));
             setDietary(data.dietary ?? ""); setNote(data.note ?? "");
             setName(data.full_name);
           }
@@ -80,13 +80,13 @@ function RsvpPage() {
     try {
       if (existingId) {
         const { error } = await supabase.from("rsvps").update({
-          full_name, status, adults, children, dietary: dietary || null, dietary_items: dietaryItems, note: note || null,
+          full_name, status, adults: Number(adults) || 1, children: Number(children) || 0, dietary: dietary || null, dietary_items: dietaryItems, note: note || null,
         }).eq("id", existingId);
         if (error) throw error;
       } else {
         const { data, error } = await supabase.from("rsvps").insert({
           event_id: event.id, guest_id: g.guestId,
-          full_name, status, adults, children, dietary: dietary || null, dietary_items: dietaryItems, note: note || null,
+          full_name, status, adults: Number(adults) || 1, children: Number(children) || 0, dietary: dietary || null, dietary_items: dietaryItems, note: note || null,
         }).select("id").single();
         if (error) throw error;
         setExistingId(data.id);
@@ -127,11 +127,11 @@ function RsvpPage() {
           <div className="grid gap-4 md:grid-cols-2">
             <div>
               <Label htmlFor="ad">Adultos</Label>
-              <Input id="ad" type="number" min={1} value={adults} onChange={(e) => setAdults(parseInt(e.target.value) || 1)} />
+              <Input id="ad" type="number" min={1} value={adults} onChange={(e) => setAdults(e.target.value)} />
             </div>
             <div>
               <Label htmlFor="ch">Niños</Label>
-              <Input id="ch" type="number" min={0} value={children} onChange={(e) => setChildren(parseInt(e.target.value) || 0)} />
+              <Input id="ch" type="number" min={0} value={children} onChange={(e) => setChildren(e.target.value)} />
             </div>
           </div>
           <div>

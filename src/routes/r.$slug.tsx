@@ -39,6 +39,11 @@ function RsvpStandalone() {
   const [adults, setAdults] = useState(1);
   const [children, setChildren] = useState(0);
   const [dietary, setDietary] = useState("");
+  const [dietaryItems, setDietaryItems] = useState<
+    { name: string; quantity: number }[]
+  >([]);
+  const [newRestriction, setNewRestriction] = useState("");
+  const [newRestrictionQty, setNewRestrictionQty] = useState(1);
   const [note, setNote] = useState("");
   const [saving, setSaving] = useState(false);
   const [existingId, setExistingId] = useState<string | null>(null);
@@ -53,7 +58,7 @@ function RsvpStandalone() {
     if (g) {
       setFullName(`${g.firstName}${g.lastName ? " " + g.lastName : ""}`);
       supabase.from("rsvps")
-        .select("id, status, adults, children, dietary, note, full_name")
+        .select("id, status, adults, children, dietary, dietary_items, note, full_name")
         .eq("event_id", event.id).eq("guest_id", g.guestId).maybeSingle()
         .then(({ data }) => {
           if (data) {
@@ -62,12 +67,38 @@ function RsvpStandalone() {
             setAdults(data.adults);
             setChildren(data.children);
             setDietary(data.dietary ?? "");
+            setDietaryItems(
+              Array.isArray(data.dietary_items)
+                ? data.dietary_items as { name: string; quantity: number }[]
+                : []
+            );
             setNote(data.note ?? "");
             setFullName(data.full_name);
           }
         });
     }
   }, [event.id, draft]);
+
+  function addRestriction() {
+    if (!newRestriction.trim()) return;
+
+    setDietaryItems([
+      ...dietaryItems,
+      {
+        name: newRestriction,
+        quantity: newRestrictionQty,
+      },
+    ]);
+
+    setNewRestriction("");
+    setNewRestrictionQty(1);
+  }
+
+  function removeRestriction(index: number) {
+    setDietaryItems(
+      dietaryItems.filter((_, i) => i !== index)
+    );
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -91,14 +122,14 @@ function RsvpStandalone() {
       if (existingId) {
         const { error } = await supabase.from("rsvps").update({
           full_name: fullName, status, adults, children,
-          dietary: dietary || null, note: note || null,
+          dietary: dietary || null, dietary_items: dietaryItems, note: note || null,
         }).eq("id", existingId);
         if (error) throw error;
       } else {
         const { data, error } = await supabase.from("rsvps").insert({
           event_id: event.id, guest_id: guest.guestId,
           full_name: fullName, status, adults, children,
-          dietary: dietary || null, note: note || null,
+          dietary: dietary || null, dietary_items: dietaryItems, note: note || null,
         }).select("id").single();
         if (error) throw error;
         setExistingId(data.id);
@@ -197,8 +228,64 @@ function RsvpStandalone() {
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="di">Restricciones alimentarias</Label>
-                  <Input id="di" value={dietary} onChange={(e) => setDietary(e.target.value)} placeholder="Vegetariano, celíaco…" />
+                  <Label>Restricciones alimentarias</Label>
+
+                  <div className="space-y-3 mt-2">
+
+                    {dietaryItems.map((item, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center gap-2 rounded-xl border p-3"
+                      >
+                        <span className="flex-1">
+                          {item.name}
+                        </span>
+              
+                        <span>
+                          x{item.quantity}
+                        </span>
+              
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => removeRestriction(index)}
+                        >
+                          X
+                                      </Button>
+                                    </div>
+                    ))}
+              
+                    <div className="flex gap-2">
+              
+                      <Input
+                        placeholder="Ej: Celíaco"
+                        value={newRestriction}
+                        onChange={(e) =>
+                          setNewRestriction(e.target.value)
+                        }
+                      />
+              
+                      <Input
+                        type="number"
+                        min={1}
+                        className="w-24"
+                        value={newRestrictionQty}
+                        onChange={(e) =>
+                          setNewRestrictionQty(Number(e.target.value))
+                        }
+                      />
+              
+                    </div>
+              
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={addRestriction}
+                    >
+                      + Agregar restricción
+                    </Button>
+              
+                  </div>
                 </div>
               </>
             )}

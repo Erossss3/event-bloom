@@ -441,6 +441,7 @@ export type Database = {
           children: number
           created_at: string
           dietary: string | null
+          dietary_items: Json | null
           event_id: string
           full_name: string
           guest_id: string | null
@@ -454,6 +455,7 @@ export type Database = {
           children?: number
           created_at?: string
           dietary?: string | null
+          dietary_items: Json | null
           event_id: string
           full_name: string
           guest_id?: string | null
@@ -467,6 +469,7 @@ export type Database = {
           children?: number
           created_at?: string
           dietary?: string | null
+          dietary_items: Json | null
           event_id?: string
           full_name?: string
           guest_id?: string | null

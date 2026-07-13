@@ -23,6 +23,12 @@ function RsvpPage() {
   const [adults, setAdults] = useState(1);
   const [children, setChildren] = useState(0);
   const [dietary, setDietary] = useState("");
+  const [dietaryItems, setDietaryItems] = useState<
+    { name: string; quantity: number }[]
+  >([]);
+
+  const [newRestriction, setNewRestriction] = useState("");
+  const [newRestrictionQty, setNewRestrictionQty] = useState(1);
   const [note, setNote] = useState("");
   const [saving, setSaving] = useState(false);
   const [existingId, setExistingId] = useState<string | null>(null);
@@ -45,6 +51,27 @@ function RsvpPage() {
     }
   }, [event.id]);
 
+  function addRestriction() {
+    if (!newRestriction.trim()) return;
+
+    setDietaryItems([
+      ...dietaryItems,
+      {
+        name: newRestriction,
+        quantity: newRestrictionQty,
+      },
+    ]);
+
+    setNewRestriction("");
+    setNewRestrictionQty(1);
+  }
+
+  function removeRestriction(index: number) {
+    setDietaryItems(
+      dietaryItems.filter((_, i) => i !== index)
+    );
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     const g = getGuest(event.id);
@@ -53,13 +80,13 @@ function RsvpPage() {
     try {
       if (existingId) {
         const { error } = await supabase.from("rsvps").update({
-          full_name, status, adults, children, dietary: dietary || null, note: note || null,
+          full_name, status, adults, children, dietary: dietary || null, dietary_items: dietaryItems, note: note || null,
         }).eq("id", existingId);
         if (error) throw error;
       } else {
         const { data, error } = await supabase.from("rsvps").insert({
           event_id: event.id, guest_id: g.guestId,
-          full_name, status, adults, children, dietary: dietary || null, note: note || null,
+          full_name, status, adults, children, dietary: dietary || null, dietary_items: dietaryItems, note: note || null,
         }).select("id").single();
         if (error) throw error;
         setExistingId(data.id);

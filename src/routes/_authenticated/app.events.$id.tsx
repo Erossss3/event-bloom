@@ -23,6 +23,7 @@ export const Route = createFileRoute("/_authenticated/app/events/$id")({
 function EventAdminPage() {
   const { id } = useParams({ from: "/_authenticated/app/events/$id" });
   const qc = useQueryClient();
+  const [showRsvps, setShowRsvps] = useState(false);
   const [zipping, setZipping] = useState(false);
 
   const { data: event } = useQuery({
@@ -55,6 +56,20 @@ function EventAdminPage() {
       };
     },
     refetchInterval: 15_000,
+  });
+
+  const { data: rsvps } = useQuery({
+    queryKey: ["event-rsvps", id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("rsvps")
+        .select("*")
+        .eq("event_id", id)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      return data;
+    },
   });
 
   const finalize = useMutation({
@@ -261,6 +276,62 @@ function EventAdminPage() {
       </section>
 
       <section className="rounded-3xl border bg-card p-6 shadow-soft">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <h2 className="font-display text-2xl">
+                Confirmaciones
+              </h2>
+
+              <p className="text-sm text-muted-foreground">
+                Información para organización y catering.
+              </p>
+            </div>
+
+            <Button variant="outline">
+              Descargar lista
+            </Button>
+          </div>
+
+
+          <div className="mt-6 space-y-4">
+
+            {rsvps
+              ?.filter((r) => r.status === "confirmed")
+              .map((rsvp) => (
+                <div
+                  key={rsvp.id}
+                  className="rounded-2xl border p-4"
+                >
+                  <h3 className="font-semibold">
+                    {rsvp.full_name}
+                  </h3>
+
+                  <p className="text-sm text-muted-foreground">
+                    {rsvp.adults} adultos · {rsvp.children} niños
+                  </p>
+
+                  id="6wz5j4"
+                  {Array.isArray(rsvp.dietary_items) &&
+                    rsvp.dietary_items.length > 0 && (
+                    <div className="mt-2 text-sm">
+                      <p className="font-medium">
+                        Restricciones:
+                      </p>
+
+                      {(rsvp.dietary_items as { name: string; quantity: number }[])
+                        .map((item, i) => (
+                          <div key={i}>
+                            {item.name} x{item.quantity}
+                          </div>
+                        ))
+                      }
+                    </div>
+                  )}
+
+                </div>
+              ))}
+
+          </div>
         <h2 className="font-display text-2xl">Galería</h2>
         <p className="text-sm text-muted-foreground">Moderá y destacá fotos para el slideshow.</p>
         <div className="mt-6"><AdminGallery eventId={id} /></div>

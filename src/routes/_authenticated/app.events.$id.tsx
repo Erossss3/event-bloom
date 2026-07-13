@@ -120,6 +120,22 @@ function EventAdminPage() {
     } finally { setZipping(false); }
   }
 
+  async function deleteEvent() {
+   try {
+     const { error } = await (supabase.rpc as any)("delete_event", {
+       event_uuid: id,
+     });
+ 
+     if (error) throw error;
+ 
+     toast.success("Evento eliminado");
+ 
+     window.location.href = "/app/events";
+   } catch (err) {
+     toast.error(err instanceof Error ? err.message : "Error al eliminar el evento");
+   }
+ }
+
   if (!event) return <div className="h-64 animate-pulse rounded-2xl bg-muted/40" />;
   const finished = event.status === "finished";
   const eventUrl = publicEventUrl(event.slug);
@@ -241,6 +257,54 @@ function EventAdminPage() {
             </AlertDialogContent>
           </AlertDialog>
           )}
+          
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+               variant="destructive"
+                className="rounded-full"
+              >
+                Eliminar evento
+              </Button>
+            </AlertDialogTrigger>
+
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  ¿Eliminar este evento?
+                </AlertDialogTitle>
+
+                <AlertDialogDescription>
+                  Esta acción eliminará permanentemente el evento y toda su información.
+
+                 <br /><br />
+
+                  • Invitados<br />
+                 • Confirmaciones<br />
+                 • Fotos y videos<br />
+                 • Mensajes<br />
+                 • Recuerdos
+
+                 <br /><br />
+
+                 Esta acción no se puede deshacer.
+                </AlertDialogDescription>
+             </AlertDialogHeader>
+
+             <AlertDialogFooter>
+                <AlertDialogCancel>
+                  Cancelar
+                </AlertDialogCancel>
+
+               <AlertDialogAction
+                 onClick={deleteEvent}
+               >
+                 Sí, eliminar
+               </AlertDialogAction>
+
+             </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
 

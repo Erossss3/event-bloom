@@ -31,13 +31,9 @@ function LivePage() {
     }
   }, [event]);
 
-  if (!event) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-black text-white">
-        Cargando...
-      </div>
-    );
-  }
-
-  return null;
+  return (
+    <div className="flex h-scren items-center justify-center bg-red-600 text-4x1 text-white">
+      ESTA ES LA RUTA LIVE
+    </div>
+  )
 }

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/app/events/$id/live")({
   component: LivePage,
@@ -25,6 +25,12 @@ function LivePage() {
     },
   });
 
+  useEffect(() => {
+    if (event) {
+      window.location.replace(`/e/${event.slug}/live`);
+    }
+  }, [event]);
+
   if (!event) {
     return (
       <div className="flex h-screen items-center justify-center bg-black text-white">
@@ -32,12 +38,6 @@ function LivePage() {
       </div>
     );
   }
-
-  useEffect(() => {
-    if (event) {
-      window.location.replace(`/e/${event.slug}/live`);
-    }
-  }, [event]);
 
   return null;
 }

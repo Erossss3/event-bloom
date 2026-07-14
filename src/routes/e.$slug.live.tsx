@@ -16,7 +16,7 @@ function LiveScreen() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("events")
-        .select("id,title")
+        .select("id")
         .eq("slug", slug)
         .single();
 
@@ -36,7 +36,7 @@ function LiveScreen() {
         .eq("event_id", event!.id)
         .eq("moderation", "approved")
         .eq("kind", "photo")
-        .order("created_at");
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
 
@@ -65,7 +65,7 @@ function LiveScreen() {
 
   if (!photos?.length) {
     return (
-      <div className="flex h-screen items-center justify-center bg-black text-white text-3xl">
+      <div className="flex h-screen items-center justify-center bg-black text-white text-xl">
         Todavía no hay fotos.
       </div>
     );
@@ -75,22 +75,28 @@ function LiveScreen() {
     <div className="relative h-screen w-screen overflow-hidden bg-black">
 
       <img
+        key={photos[index].public_url}
         src={photos[index].public_url}
-        className="absolute inset-0 h-full w-full object-contain transition-all duration-1000"
+        className="
+          absolute inset-0
+          h-full w-full
+          object-cover
+          transition-opacity
+          duration-1000
+        "
       />
 
-      <div className="absolute left-0 top-0 h-40 w-full bg-gradient-to-b from-black/70 to-transparent" />
-
-      <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent p-12">
-
-        <h1 className="text-5xl font-bold">
-          {event.title}
-        </h1>
-
-        <p className="mt-3 text-xl text-white/70">
-          LiveMoments
-        </p>
-
+      <div
+        className="
+          absolute
+          bottom-6
+          right-8
+          text-sm
+          tracking-widest
+          text-white/60
+        "
+      >
+        LiveMoments
       </div>
 
     </div>

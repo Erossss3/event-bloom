@@ -11,6 +11,36 @@ function LiveScreen() {
   const { slug } = Route.useParams();
   const [fade, setFade] = useState(true);
   const [index, setIndex] = useState(0);
+  const [style, setStyle] = useState<
+    "elegante" | "minimalista" | "fiesta" | "moderno"
+  >("elegante");
+  const liveStyles = {
+    elegante: {
+        duration: 6000,
+        animation: "animate-kenburns",
+        transition: "duration-1000",
+    },
+
+    minimalista: {
+      duration: 7000,
+      animation: "",
+      transition: "duration-2000",
+    },
+
+    fiesta: {
+      duration: 3000,
+      animation: "animate-kenburns",
+      transition: "duration-500",
+    },
+
+    moderno: {
+      duration: 5000,
+      animation: "animate-kenburns",
+      transition: "duration-1000",
+    },
+  };
+
+  const currentStyle = liveStyles[style];
 
   const { data: event } = useQuery({
     queryKey: ["live-event", slug],
@@ -57,7 +87,7 @@ function LiveScreen() {
         setFade(true);
       }, 1000);
     
-    }, 6000);
+    }, currentStyle.duration);
 
     return () => clearInterval(timer);
   }, [photos]);
@@ -102,10 +132,11 @@ function LiveScreen() {
         className={`
           absolute inset-0
           h-full w-full
-          animate-kenburns
+          ${currentStyle.animation}
           object-contain
+          ${currentStyle.transition}
           ${fade ? "opacity-100" : "opacity-0"}
-          transition-opacity duration-1000
+          transition-opacity 
         `}
       />
 

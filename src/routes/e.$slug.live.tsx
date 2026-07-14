@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/e/$slug/live")({
@@ -8,6 +9,7 @@ export const Route = createFileRoute("/e/$slug/live")({
 
 function LiveScreen() {
   const { slug } = Route.useParams();
+  const [index, setIndex] = useState(0);
 
   const { data: event } = useQuery({
     queryKey: ["live-event", slug],
@@ -43,6 +45,16 @@ function LiveScreen() {
     refetchInterval: 5000,
   });
 
+  useEffect(() => {
+    if (!photos?.length) return;
+
+    const timer = setInterval(() => {
+      setIndex((i) => (i + 1) % photos.length);
+    }, 5000);
+
+    return () => clearInterval(timer);
+  }, [photos]);
+
   if (!event) {
     return (
       <div className="flex h-screen items-center justify-center text-xl">
@@ -62,7 +74,7 @@ function LiveScreen() {
   return (
     <div className="h-screen w-screen bg-black">
       <img
-        src={photos[0].public_url}
+        src={photos[index].public_url}
         className="h-full w-full object-contain"
       />
     </div>

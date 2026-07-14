@@ -414,12 +414,15 @@ function EventAdminPage() {
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
-          <Button 
-            onClick={() => window.location.href = `/app/events/${event.id}/live`}
-            className="rounded-full bg-foreground text-background"
+          <Link
+            to="/app/events/$id/live"
+            params={{ id: event.id }}
           >
-            <Tv className="h-4 w-4" /> Pantalla en vivo
-          </Button>
+            <Button className="rounded-full bg-foreground text-background">
+              <Tv className="h-4 w-4" />
+              Pantalla en vivo
+            </Button>
+          </Link>
           {finished ? (
             <Button variant="outline" onClick={() => reopen.mutate()} disabled={reopen.isPending}
               className="rounded-full">Reabrir evento</Button>

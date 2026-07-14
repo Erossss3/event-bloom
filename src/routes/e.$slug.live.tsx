@@ -12,8 +12,8 @@ function LiveScreen() {
   const [fade, setFade] = useState(true);
   const [index, setIndex] = useState(0);
   const [style, setStyle] = useState<
-    "elegante" | "minimalista" | "fiesta" | "moderno"
-  >("elegante");
+    "elegante" | "minimalista" | "fiesta" | "moderno" | "vertical" | "mosaico2" | "mosaico4"
+  >("mosaico2");
   const liveStyles = {
     elegante: {
         duration: 6000,
@@ -38,9 +38,30 @@ function LiveScreen() {
       animation: "animate-modern",
       transition: "duration-1000",
     },
+
+    vertical: {
+        duration: 6000,
+        animation: "animate-modern",
+        transition: "duration-1500",
+    },
+
+    mosaico2: {
+      duration: 6000,
+      animation: "",
+      transition: "duration-1000",
+    },
+
+    mosaico4: {
+      duration: 6000,
+      animation: "",
+      transition: "duration-1000",
+    },
   };
 
   const currentStyle = liveStyles[style];
+
+  const isMosaic =
+    style === "mosaico2" || style === "mosaico4";
 
   const { data: event } = useQuery({
     queryKey: ["live-event", slug],

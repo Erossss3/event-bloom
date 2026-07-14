@@ -9,6 +9,7 @@ export const Route = createFileRoute("/e/$slug/live")({
 
 function LiveScreen() {
   const { slug } = Route.useParams();
+  const [showCursor, setShowCursor] = useState(true);
   const [fade, setFade] = useState(true);
   const [mosaicIndex, setMosaicIndex] = useState(0);
   const [index, setIndex] = useState(0);
@@ -134,6 +135,29 @@ function LiveScreen() {
     enterFullscreen();
   }, []);
 
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout>;
+
+    const move = () => {
+      setShowCursor(true);
+  
+      clearTimeout(timer);
+  
+      timer = setTimeout(() => {
+        setShowCursor(false);
+      }, 3000);
+    };
+
+    move();
+
+    window.addEventListener("mousemove", move);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("mousemove", move);
+    };
+  }, []);
+
   if (!event) {
     return (
       <div className="flex h-screen items-center justify-center bg-black text-white">
@@ -151,7 +175,11 @@ function LiveScreen() {
   }
 
   return (
-    <div className="relative h-screen w-screen overflow-hidden bg-black">
+    <div
+      className={`relative h-screen w-screen overflow-hidden bg-black ${
+        showCursor ? "cursor-default" : "cursor-none"
+      }`}
+    >
       {!isMosaic && (
         <div className="absolute inset-0 overflow-hidden">
           <img

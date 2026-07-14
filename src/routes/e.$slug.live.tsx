@@ -147,6 +147,33 @@ function LiveScreen() {
 
         <div className="absolute inset-0 bg-black/30" />
       </div>
+  
+    {style === "mosaico2" ? (
+      <div className="absolute inset-0 grid grid-cols-2 gap-1">
+        <img
+          src={photos[index % photos.length].public_url}
+          className="h-full w-full object-cover"
+        />
+
+        <img
+          src={photos[(index + 1) % photos.length].public_url}
+          className="h-full w-full object-cover"
+        />
+      </div>
+
+    ) : style === "mosaico4" ? (
+
+      <div className="absolute inset-0 grid grid-cols-2 grid-rows-2 gap-1">
+        {[0, 1, 2, 3].map((offset) => (
+          <img
+            key={offset}
+            src={photos[(index + offset) % photos.length].public_url}
+            className="h-full w-full object-cover"
+          />
+        ))}
+      </div>
+
+    ) : (
 
       <img
         src={photos[index].public_url}
@@ -160,6 +187,8 @@ function LiveScreen() {
           transition-opacity 
         `}
       />
+    
+        )}
 
       <div
         className="

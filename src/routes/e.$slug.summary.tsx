@@ -80,7 +80,12 @@ function SummaryPage() {
   }, [photos.length]);
 
   const current = photos[idx];
-  const messageForFrame = messages[idx % Math.max(1, messages.length)];
+  const messageForFrame =
+    idx >= 0 &&
+    idx % 5 === 4 &&
+    messages.length > 0
+      ? messages[Math.floor(idx / 5) % messages.length]
+      : null;
 
   return (
     <div className={`fixed inset-0 z-40 bg-gradient-to-br ${palette} text-white`}>

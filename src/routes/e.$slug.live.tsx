@@ -98,8 +98,9 @@ function LiveScreen() {
           h-full w-full
           animate-kenburns
           object-contain
-          transition-opacity
-          duration-1000
+          transition-all
+          duration-2000ms
+          ease-in-put
         "
       />
 

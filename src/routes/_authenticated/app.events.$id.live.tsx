@@ -1,39 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/app/events/$id/live")({
   component: LivePage,
 });
 
 function LivePage() {
-  const { id } = Route.useParams();
-
-  const { data: event } = useQuery({
-    queryKey: ["event-live-admin", id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("events")
-        .select("slug")
-        .eq("id", id)
-        .single();
-
-      if (error) throw error;
-
-      return data;
-    },
-  });
-
-  useEffect(() => {
-    if (event) {
-      window.location.replace(`/e/${event.slug}/live`);
-    }
-  }, [event]);
-
   return (
-    <div className="flex h-scren items-center justify-center bg-red-600 text-4x1 text-white">
-      ESTA ES LA RUTA LIVE
+    <div
+      style={{
+        background: "red",
+        color: "white",
+        height: "100vh",
+        display: "grid",
+        placeItems: "center",
+        fontSize: "50px",
+        fontWeight: "bold",
+      }}
+    >
+      RUTA LIVE FUNCIONANDO
     </div>
-  )
+  );
 }

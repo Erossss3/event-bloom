@@ -13,6 +13,7 @@ function LiveScreen() {
   const [fade, setFade] = useState(true);
   const [mosaicIndex, setMosaicIndex] = useState(0);
   const [index, setIndex] = useState(0);
+  const [isVertical, setIsVertical] = useState(false);
   const [style, setStyle] = useState<
     "elegante" | "minimalista" | "fiesta" | "moderno" | "vertical" | "mosaico2" | "mosaico4"
   >("mosaico2");
@@ -158,6 +159,36 @@ function LiveScreen() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!photos?.length) return;
+
+    if (style === "mosaico2" || style === "mosaico4") {
+      const amount = style === "mosaico2" ? 2 : 4;
+
+      for (let i = 0; i < amount; i++) {
+        const img = new Image();
+        img.src = photos[(mosaicIndex + amount + i) % photos.length].public_url;
+      }
+
+      return;
+    }
+
+    const img = new Image();
+    img.src = photos[(index + 1) % photos.length].public_url;
+  }, [index, mosaicIndex, photos, style]);
+
+  useEffect(() => {
+    if (!photos?.length) return;
+
+    const img = new Image();
+
+    img.onload = () => {
+      setIsVertical(img.height > img.width);
+    };
+
+    img.src = photos[index].public_url;
+  }, [index, photos]);
+
   if (!event) {
     return (
       <div className="flex h-screen items-center justify-center bg-black text-white">
@@ -230,7 +261,12 @@ function LiveScreen() {
         className={`
           absolute inset-0
           h-full w-full
-          ${currentStyle.animation}
+          ${
+            currentStyle.animation ||
+            (isVertical
+              ? "animate-pan-vertical"
+              : "animate-pan-horizontal")
+          }
           object-contain
           ${currentStyle.transition}
           ${fade ? "opacity-100" : "opacity-0"}

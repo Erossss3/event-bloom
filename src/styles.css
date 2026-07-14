@@ -204,3 +204,31 @@
 .animate-modern {
   animation: modernMove 5s ease-in-out infinite alternate;
 }
+
+@keyframes pan-horizontal {
+  0% {
+    transform: scale(1.08) translateX(-2%);
+  }
+
+  100% {
+    transform: scale(1.08) translateX(2%);
+  }
+}
+
+@keyframes pan-vertical {
+  0% {
+    transform: scale(1.08) translateY(-2%);
+  }
+
+  100% {
+    transform: scale(1.08) translateY(2%);
+  }
+}
+
+.animate-pan-horizontal {
+  animation: pan-horizontal 10s linear forwards;
+}
+
+.animate-pan-vertical {
+  animation: pan-vertical 10s linear forwards;
+}

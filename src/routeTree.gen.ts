@@ -25,7 +25,6 @@ import { Route as ESlugLiveRouteImport } from './routes/e.$slug.live'
 import { Route as ESlugGalleryRouteImport } from './routes/e.$slug.gallery'
 import { Route as AuthenticatedAppEventsNewRouteImport } from './routes/_authenticated/app.events.new'
 import { Route as AuthenticatedAppEventsIdRouteImport } from './routes/_authenticated/app.events.$id'
-import { Route as AuthenticatedAppEventsIdLiveRouteImport } from './routes/_authenticated/app.events.$id.live'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -108,12 +107,6 @@ const AuthenticatedAppEventsIdRoute =
     path: '/events/$id',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedAppEventsIdLiveRoute =
-  AuthenticatedAppEventsIdLiveRouteImport.update({
-    id: '/live',
-    path: '/live',
-    getParentRoute: () => AuthenticatedAppEventsIdRoute,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -129,9 +122,8 @@ export interface FileRoutesByFullPath {
   '/e/$slug/summary': typeof ESlugSummaryRoute
   '/app/': typeof AuthenticatedAppIndexRoute
   '/e/$slug/': typeof ESlugIndexRoute
-  '/app/events/$id': typeof AuthenticatedAppEventsIdRouteWithChildren
+  '/app/events/$id': typeof AuthenticatedAppEventsIdRoute
   '/app/events/new': typeof AuthenticatedAppEventsNewRoute
-  '/app/events/$id/live': typeof AuthenticatedAppEventsIdLiveRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -145,9 +137,8 @@ export interface FileRoutesByTo {
   '/e/$slug/summary': typeof ESlugSummaryRoute
   '/app': typeof AuthenticatedAppIndexRoute
   '/e/$slug': typeof ESlugIndexRoute
-  '/app/events/$id': typeof AuthenticatedAppEventsIdRouteWithChildren
+  '/app/events/$id': typeof AuthenticatedAppEventsIdRoute
   '/app/events/new': typeof AuthenticatedAppEventsNewRoute
-  '/app/events/$id/live': typeof AuthenticatedAppEventsIdLiveRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -165,9 +156,8 @@ export interface FileRoutesById {
   '/e/$slug/summary': typeof ESlugSummaryRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
   '/e/$slug/': typeof ESlugIndexRoute
-  '/_authenticated/app/events/$id': typeof AuthenticatedAppEventsIdRouteWithChildren
+  '/_authenticated/app/events/$id': typeof AuthenticatedAppEventsIdRoute
   '/_authenticated/app/events/new': typeof AuthenticatedAppEventsNewRoute
-  '/_authenticated/app/events/$id/live': typeof AuthenticatedAppEventsIdLiveRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -187,7 +177,6 @@ export interface FileRouteTypes {
     | '/e/$slug/'
     | '/app/events/$id'
     | '/app/events/new'
-    | '/app/events/$id/live'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -203,7 +192,6 @@ export interface FileRouteTypes {
     | '/e/$slug'
     | '/app/events/$id'
     | '/app/events/new'
-    | '/app/events/$id/live'
   id:
     | '__root__'
     | '/'
@@ -222,7 +210,6 @@ export interface FileRouteTypes {
     | '/e/$slug/'
     | '/_authenticated/app/events/$id'
     | '/_authenticated/app/events/new'
-    | '/_authenticated/app/events/$id/live'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -347,39 +334,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppEventsIdRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/app/events/$id/live': {
-      id: '/_authenticated/app/events/$id/live'
-      path: '/live'
-      fullPath: '/app/events/$id/live'
-      preLoaderRoute: typeof AuthenticatedAppEventsIdLiveRouteImport
-      parentRoute: typeof AuthenticatedAppEventsIdRoute
-    }
   }
 }
-
-interface AuthenticatedAppEventsIdRouteChildren {
-  AuthenticatedAppEventsIdLiveRoute: typeof AuthenticatedAppEventsIdLiveRoute
-}
-
-const AuthenticatedAppEventsIdRouteChildren: AuthenticatedAppEventsIdRouteChildren =
-  {
-    AuthenticatedAppEventsIdLiveRoute: AuthenticatedAppEventsIdLiveRoute,
-  }
-
-const AuthenticatedAppEventsIdRouteWithChildren =
-  AuthenticatedAppEventsIdRoute._addFileChildren(
-    AuthenticatedAppEventsIdRouteChildren,
-  )
 
 interface AuthenticatedAppRouteChildren {
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
-  AuthenticatedAppEventsIdRoute: typeof AuthenticatedAppEventsIdRouteWithChildren
+  AuthenticatedAppEventsIdRoute: typeof AuthenticatedAppEventsIdRoute
   AuthenticatedAppEventsNewRoute: typeof AuthenticatedAppEventsNewRoute
 }
 
 const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
-  AuthenticatedAppEventsIdRoute: AuthenticatedAppEventsIdRouteWithChildren,
+  AuthenticatedAppEventsIdRoute: AuthenticatedAppEventsIdRoute,
   AuthenticatedAppEventsNewRoute: AuthenticatedAppEventsNewRoute,
 }
 

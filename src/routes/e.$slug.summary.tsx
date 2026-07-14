@@ -111,17 +111,9 @@ function SummaryPage() {
             className="absolute inset-0 flex flex-col items-center justify-center text-center px-8"
           >
 
-            <h1 className="font-display text-5x1">
+            <h1 className="font-display text-10x3">
               ✨ Gracias por compartir este momento ✨
             </h1>
-
-            <div className="mt-10 space-y-3 text-x1">
-
-              <p>{photos.length} fotos</p>
-
-              <p>{messages.length} mensajes</p>
-
-            </div>
 
             <p className="mt-16 text-lg opacity-70">
               Creado con LiveMoments

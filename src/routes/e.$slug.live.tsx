@@ -286,26 +286,26 @@ function LiveScreen() {
       )}
   
     {style === "mosaico2" ? (
-      <div className="absolute inset-0 grid grid-cols-2 gap-1">
+      <div className={` absolute inset-0 grid grid-cols-2 gap-1 transition-opacity duration-1000 ${fade ? "opacity-100" : "opacity-0"} `}>
         <img
           src={photos[mosaicIndex % photos.length].public_url}
-          className="h-full w-full object-cover"
+          className={` h-full w-full object-cover animate-kenburns ${fade ? "opacity-100" : "opacity-0"} transition-opacity duration-1000 `}
         />
 
         <img
           src={photos[(mosaicIndex + 1) % photos.length].public_url}
-          className="h-full w-full object-cover"
+          className={` h-full w-full object-cover animate-kenburns ${fade ? "opacity-100" : "opacity-0"} transition-opacity duration-1000 `}
         />
       </div>
 
     ) : style === "mosaico4" ? (
 
-      <div className="absolute inset-0 grid grid-cols-2 grid-rows-2 gap-1">
+      <div className={` absolute inset-0 grid grid-cols-2 gap-1 transition-opacity duration-1000 ${fade ? "opacity-100" : "opacity-0"} `}>
         {[0, 1, 2, 3].map((offset) => (
           <img
             key={offset}
             src={photos[(mosaicIndex + offset) % photos.length].public_url}
-            className="h-full w-full object-cover"
+            className={` h-full w-full object-cover animate-kenburns ${fade ? "opacity-100" : "opacity-0"} transition-opacity duration-1000 `}
           />
         ))}
       </div>

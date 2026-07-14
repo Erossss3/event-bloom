@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { LiveMomentsLogo } from "@/components/Logo";
 
 export const Route = createFileRoute("/e/$slug/live")({
   validateSearch: (search) => ({
@@ -20,6 +21,7 @@ function LiveScreen() {
   const [index, setIndex] = useState(0);
   const qc = useQueryClient();
   const [isVertical, setIsVertical] = useState(false);
+  const [loadingScreen, setLoadingSreen] = useState(true);
   const [style, setStyle] = useState<
     "elegante" | "minimalista" | "fiesta" | "moderno" | "vertical" | "mosaico2" | "mosaico4"
   >(
@@ -223,10 +225,36 @@ function LiveScreen() {
     };
   }, [event, qc]);
 
+  useEffect(() => {
+    if (photos?.length) {
+      const timer = setTimeout(() => {
+        setLoadingScreen(false);
+      }, 1200);
+
+      return () => clearTimeout(timer);
+    }
+  }, [photos]);
+
   if (!event) {
     return (
       <div className="flex h-screen items-center justify-center bg-black text-white">
         Cargando...
+      </div>
+    );
+  }
+
+  if (loadingScreen) {
+    return (
+      <div className="flex h-screen w-screen flex-col items-center justify-center bg-black text-white">
+        <LiveMomentsLogo className="h-16 w-auto" />
+
+        <div className="mt-8 h-1 w-48 overflow-hidden rounded-full bg-white/10">
+          <div className="h-full w-full animate-pulse rounded-full bg-gold" />
+        </div>
+
+        <p className="mt-6 text-sm tracking-[0.3em] text-white/60 uppercase">
+          Preparando pantalla...
+        </p>
       </div>
     );
   }

@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useEffect } from "react";
 
 export const Route = createFileRoute("/_authenticated/app/events/$id/live")({
   component: LivePage,
@@ -32,7 +33,11 @@ function LivePage() {
     );
   }
 
-  window.location.replace(`/e/${event.slug}/live`);
+  useEffect(() => {
+    if (event) {
+      window.location.replace(`/e/${event.slug}/live`);
+    }
+  }, [event]);
 
   return null;
 }

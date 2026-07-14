@@ -21,6 +21,7 @@ import { Route as ESlugSummaryRouteImport } from './routes/e.$slug.summary'
 import { Route as ESlugRsvpRouteImport } from './routes/e.$slug.rsvp'
 import { Route as ESlugMessagesRouteImport } from './routes/e.$slug.messages'
 import { Route as ESlugMemoriesRouteImport } from './routes/e.$slug.memories'
+import { Route as ESlugLiveRouteImport } from './routes/e.$slug.live'
 import { Route as ESlugGalleryRouteImport } from './routes/e.$slug.gallery'
 import { Route as AuthenticatedAppEventsNewRouteImport } from './routes/_authenticated/app.events.new'
 import { Route as AuthenticatedAppEventsIdRouteImport } from './routes/_authenticated/app.events.$id'
@@ -85,6 +86,11 @@ const ESlugMemoriesRoute = ESlugMemoriesRouteImport.update({
   path: '/memories',
   getParentRoute: () => ESlugRoute,
 } as any)
+const ESlugLiveRoute = ESlugLiveRouteImport.update({
+  id: '/live',
+  path: '/live',
+  getParentRoute: () => ESlugRoute,
+} as any)
 const ESlugGalleryRoute = ESlugGalleryRouteImport.update({
   id: '/gallery',
   path: '/gallery',
@@ -116,6 +122,7 @@ export interface FileRoutesByFullPath {
   '/e/$slug': typeof ESlugRouteWithChildren
   '/r/$slug': typeof RSlugRoute
   '/e/$slug/gallery': typeof ESlugGalleryRoute
+  '/e/$slug/live': typeof ESlugLiveRoute
   '/e/$slug/memories': typeof ESlugMemoriesRoute
   '/e/$slug/messages': typeof ESlugMessagesRoute
   '/e/$slug/rsvp': typeof ESlugRsvpRoute
@@ -131,6 +138,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/r/$slug': typeof RSlugRoute
   '/e/$slug/gallery': typeof ESlugGalleryRoute
+  '/e/$slug/live': typeof ESlugLiveRoute
   '/e/$slug/memories': typeof ESlugMemoriesRoute
   '/e/$slug/messages': typeof ESlugMessagesRoute
   '/e/$slug/rsvp': typeof ESlugRsvpRoute
@@ -150,6 +158,7 @@ export interface FileRoutesById {
   '/e/$slug': typeof ESlugRouteWithChildren
   '/r/$slug': typeof RSlugRoute
   '/e/$slug/gallery': typeof ESlugGalleryRoute
+  '/e/$slug/live': typeof ESlugLiveRoute
   '/e/$slug/memories': typeof ESlugMemoriesRoute
   '/e/$slug/messages': typeof ESlugMessagesRoute
   '/e/$slug/rsvp': typeof ESlugRsvpRoute
@@ -169,6 +178,7 @@ export interface FileRouteTypes {
     | '/e/$slug'
     | '/r/$slug'
     | '/e/$slug/gallery'
+    | '/e/$slug/live'
     | '/e/$slug/memories'
     | '/e/$slug/messages'
     | '/e/$slug/rsvp'
@@ -184,6 +194,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/r/$slug'
     | '/e/$slug/gallery'
+    | '/e/$slug/live'
     | '/e/$slug/memories'
     | '/e/$slug/messages'
     | '/e/$slug/rsvp'
@@ -202,6 +213,7 @@ export interface FileRouteTypes {
     | '/e/$slug'
     | '/r/$slug'
     | '/e/$slug/gallery'
+    | '/e/$slug/live'
     | '/e/$slug/memories'
     | '/e/$slug/messages'
     | '/e/$slug/rsvp'
@@ -307,6 +319,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ESlugMemoriesRouteImport
       parentRoute: typeof ESlugRoute
     }
+    '/e/$slug/live': {
+      id: '/e/$slug/live'
+      path: '/live'
+      fullPath: '/e/$slug/live'
+      preLoaderRoute: typeof ESlugLiveRouteImport
+      parentRoute: typeof ESlugRoute
+    }
     '/e/$slug/gallery': {
       id: '/e/$slug/gallery'
       path: '/gallery'
@@ -380,6 +399,7 @@ const AuthenticatedRouteRouteWithChildren =
 
 interface ESlugRouteChildren {
   ESlugGalleryRoute: typeof ESlugGalleryRoute
+  ESlugLiveRoute: typeof ESlugLiveRoute
   ESlugMemoriesRoute: typeof ESlugMemoriesRoute
   ESlugMessagesRoute: typeof ESlugMessagesRoute
   ESlugRsvpRoute: typeof ESlugRsvpRoute
@@ -389,6 +409,7 @@ interface ESlugRouteChildren {
 
 const ESlugRouteChildren: ESlugRouteChildren = {
   ESlugGalleryRoute: ESlugGalleryRoute,
+  ESlugLiveRoute: ESlugLiveRoute,
   ESlugMemoriesRoute: ESlugMemoriesRoute,
   ESlugMessagesRoute: ESlugMessagesRoute,
   ESlugRsvpRoute: ESlugRsvpRoute,

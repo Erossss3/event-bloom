@@ -414,9 +414,12 @@ function EventAdminPage() {
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
-          <Link to="/app/events/$id/live" params={{ id: event.id }} className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-4 py-2 text-sm text-background">
+          <Button 
+            onClick={() => window.location.href = `/app/events/${event.id}/live`}
+            className="rounded-full bg-foreground text-background"
+          >
             <Tv className="h-4 w-4" /> Pantalla en vivo
-          </Link>
+          </Button>
           {finished ? (
             <Button variant="outline" onClick={() => reopen.mutate()} disabled={reopen.isPending}
               className="rounded-full">Reabrir evento</Button>

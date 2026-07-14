@@ -120,6 +120,20 @@ function LiveScreen() {
     return () => clearInterval(timer);
   }, [photos]);
 
+  useEffect(() => {
+    const enterFullscreen = async () => {
+      try {
+        if (!document.fullscreenElement) {
+          await document.documentElement.requestFullscreen();
+        }
+      } catch {
+        // El navegador puede requerir interacción del usuario.
+      }
+    };
+
+    enterFullscreen();
+  }, []);
+
   if (!event) {
     return (
       <div className="flex h-screen items-center justify-center bg-black text-white">

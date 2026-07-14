@@ -21,7 +21,7 @@ function LiveScreen() {
   const [index, setIndex] = useState(0);
   const qc = useQueryClient();
   const [isVertical, setIsVertical] = useState(false);
-  const [loadingScreen, setLoadingSreen] = useState(true);
+  const [loadingScreen, setLoadingScreen] = useState(true);
   const [style, setStyle] = useState<
     "elegante" | "minimalista" | "fiesta" | "moderno" | "vertical" | "mosaico2" | "mosaico4"
   >(

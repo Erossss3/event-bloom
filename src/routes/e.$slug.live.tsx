@@ -1,9 +1,70 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
-export const Route = createFileRoute('/e/$slug/live')({
-  component: RouteComponent,
-})
+export const Route = createFileRoute("/e/$slug/live")({
+  component: LiveScreen,
+});
 
-function RouteComponent() {
-  return <div>Hello "/e/$slug/live"!</div>
+function LiveScreen() {
+  const { slug } = Route.useParams();
+
+  const { data: event } = useQuery({
+    queryKey: ["live-event", slug],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("events")
+        .select("id,title")
+        .eq("slug", slug)
+        .single();
+
+      if (error) throw error;
+
+      return data;
+    },
+  });
+
+  const { data: photos } = useQuery({
+    enabled: !!event,
+    queryKey: ["live-photos", event?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("gallery")
+        .select("public_url")
+        .eq("event_id", event!.id)
+        .eq("moderation", "approved")
+        .eq("kind", "photo")
+        .order("created_at");
+
+      if (error) throw error;
+
+      return data;
+    },
+    refetchInterval: 5000,
+  });
+
+  if (!event) {
+    return (
+      <div className="flex h-screen items-center justify-center text-xl">
+        Cargando...
+      </div>
+    );
+  }
+
+  if (!photos?.length) {
+    return (
+      <div className="flex h-screen items-center justify-center text-xl">
+        Todavía no hay fotos.
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-screen w-screen bg-black">
+      <img
+        src={photos[0].public_url}
+        className="h-full w-full object-contain"
+      />
+    </div>
+  );
 }

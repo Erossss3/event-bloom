@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/e/$slug/live")({
   component: LiveScreen,
@@ -13,6 +14,7 @@ function LiveScreen() {
   const [fade, setFade] = useState(true);
   const [mosaicIndex, setMosaicIndex] = useState(0);
   const [index, setIndex] = useState(0);
+  const qc = useQueryClient();
   const [isVertical, setIsVertical] = useState(false);
   const [style, setStyle] = useState<
     "elegante" | "minimalista" | "fiesta" | "moderno" | "vertical" | "mosaico2" | "mosaico4"
@@ -97,7 +99,7 @@ function LiveScreen() {
 
       return data;
     },
-    refetchInterval: 5000,
+    refetchInterval: 30000,
   });
 
   useEffect(() => {
@@ -188,6 +190,32 @@ function LiveScreen() {
 
     img.src = photos[index].public_url;
   }, [index, photos]);
+
+  useEffect(() => {
+    if (!event) return;
+
+    const channel = supabase
+      .channel(`gallery-${event.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "gallery",
+          filter: `event_id=eq.${event.id}`,
+        },
+        () => {
+          qc.invalidateQueries({
+            queryKey: ["live-photos", event.id],
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [event, qc]);
 
   if (!event) {
     return (

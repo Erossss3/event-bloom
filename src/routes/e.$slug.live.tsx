@@ -238,7 +238,15 @@ function LiveScreen() {
   if (!event) {
     return (
       <div className="flex h-screen items-center justify-center bg-black text-white">
-        Cargando...
+         <LiveMomentsLogo className="h-16 w-auto" />
+
+        <div className="mt-8 h-1 w-48 overflow-hidden rounded-full bg-white/10">
+          <div className="h-full w-full animate-pulse rounded-full bg-gold" />
+        </div>
+
+        <p className="mt-6 text-sm tracking-[0.3em] text-white/60 uppercase">
+          Preparando pantalla...
+        </p>
       </div>
     );
   }

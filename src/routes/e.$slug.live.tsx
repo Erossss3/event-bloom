@@ -9,6 +9,7 @@ export const Route = createFileRoute("/e/$slug/live")({
 
 function LiveScreen() {
   const { slug } = Route.useParams();
+  const [fade, setFade] = useState(true);
   const [index, setIndex] = useState(0);
 
   const { data: event } = useQuery({
@@ -49,7 +50,13 @@ function LiveScreen() {
     if (!photos?.length) return;
 
     const timer = setInterval(() => {
-      setIndex((i) => (i + 1) % photos.length);
+      setFade(false);
+
+      setTimeout(() => {
+        setIndex((i) => (i + 1) % photos.length);
+        setFade(true);
+      }, 1000);
+    
     }, 6000);
 
     return () => clearInterval(timer);
@@ -91,17 +98,15 @@ function LiveScreen() {
       </div>
 
       <img
-        key={photos[index].public_url}
         src={photos[index].public_url}
-        className="
+        className={`
           absolute inset-0
           h-full w-full
           animate-kenburns
           object-contain
-          transition-all
-          duration-2000ms
-          ease-in-out
-        "
+          ${fade ? "opacity-100" : "opacity-0"}
+          transition-opacity duration-1000
+        `}
       />
 
       <div

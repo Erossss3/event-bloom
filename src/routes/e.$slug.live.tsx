@@ -10,6 +10,7 @@ export const Route = createFileRoute("/e/$slug/live")({
 function LiveScreen() {
   const { slug } = Route.useParams();
   const [fade, setFade] = useState(true);
+  const [mosaicIndex, setMosaicIndex] = useState(0);
   const [index, setIndex] = useState(0);
   const [style, setStyle] = useState<
     "elegante" | "minimalista" | "fiesta" | "moderno" | "vertical" | "mosaico2" | "mosaico4"
@@ -104,7 +105,13 @@ function LiveScreen() {
       setFade(false);
 
       setTimeout(() => {
-        setIndex((i) => (i + 1) % photos.length);
+        if (style === "mosaico2") {
+          setMosaicIndex((i) => (i + 2) % photos.length);
+        } else if (style === "mosaico4") {
+          setMosaicIndex((i) => (i + 4) % photos.length);
+        } else {
+          setIndex((i) => (i + 1) % photos.length);
+        }
         setFade(true);
       }, 1000);
     
@@ -131,32 +138,33 @@ function LiveScreen() {
 
   return (
     <div className="relative h-screen w-screen overflow-hidden bg-black">
+      {!isMosaic && (
+        <div className="absolute inset-0 overflow-hidden">
+          <img
+            src={photos[index].public_url}
+            className="
+              absolute inset-0
+              h-full w-full
+              object-cover
+              scale-110
+              blur-2xl
+              opacity-40
+            "
+          />
 
-      <div className="absolute inset-0 overflow-hidden">
-        <img
-          src={photos[index].public_url}
-          className="
-            absolute inset-0
-            h-full w-full
-            object-cover
-            scale-110
-            blur-2xl
-            opacity-40
-          "
-        />
-
-        <div className="absolute inset-0 bg-black/30" />
-      </div>
+          <div className="absolute inset-0 bg-black/30" />
+        </div>
+      )}
   
     {style === "mosaico2" ? (
       <div className="absolute inset-0 grid grid-cols-2 gap-1">
         <img
-          src={photos[index % photos.length].public_url}
+          src={photos[mosaicIndex % photos.length].public_url}
           className="h-full w-full object-cover"
         />
 
         <img
-          src={photos[(index + 1) % photos.length].public_url}
+          src={photos[(mosaicIndex + 1) % photos.length].public_url}
           className="h-full w-full object-cover"
         />
       </div>
@@ -167,7 +175,7 @@ function LiveScreen() {
         {[0, 1, 2, 3].map((offset) => (
           <img
             key={offset}
-            src={photos[(index + offset) % photos.length].public_url}
+            src={photos[(mosaicIndex + offset) % photos.length].public_url}
             className="h-full w-full object-cover"
           />
         ))}

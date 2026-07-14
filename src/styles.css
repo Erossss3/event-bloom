@@ -148,3 +148,17 @@
   to { opacity: 1; transform: translateY(0); }
 }
 @utility animate-fade-up { animation: momento-fade-up 0.6s ease-out both; }
+
+@keyframes kenburns {
+  0% {
+    transform: scale(1);
+  }
+
+  100% {
+    transform: scale(1.08);
+  }
+}
+
+.animate-kenburns {
+  animation: kenburns 6s ease-in-out infinite alternate;
+}

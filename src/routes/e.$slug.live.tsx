@@ -96,6 +96,7 @@ function LiveScreen() {
         className="
           absolute inset-0
           h-full w-full
+          animate-kenburns
           object-contain
           transition-opacity
           duration-1000

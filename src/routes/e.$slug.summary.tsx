@@ -65,22 +65,25 @@ function SummaryPage() {
 
   useEffect(() => {
     if (photos.length === 0) return;
+
+    let interval: ReturnType<typeof setInterval>;
     
     const first = setTimeout(() => {
       setIdx(0);
-    }, 4000);
     
-    const interval = setInterval(() => {
-      setIdx((i) => {
-        if (i < photos.length - 1) return i + 1;
-        if (i === photos.length - 1) return END_SCREEN;
-        return END_SCREEN;
-      });
-    }, 4200);
+      interval = setInterval(() => {
+        setIdx((i) => {
+          if (i < photos.length - 1) return i + 1;
+          if (i === photos.length - 1) return END_SCREEN;
+          return END_SCREEN;
+        });
+      }, 4200);
+
+    }, 4000);
 
     return () => {
       clearTimeout(first);
-      clearInterval(interval);
+      if (interval) clearInterval(interval);
     };
   }, [photos.length]);
 
@@ -111,7 +114,7 @@ function SummaryPage() {
             className="absolute inset-0 flex flex-col items-center justify-center text-center px-8"
           >
 
-            <h1 className="font-display text-10x3">
+            <h1 className="font-display text-8x1 md:text-9x1 leading-tight">
               ✨ Gracias por compartir este momento ✨
             </h1>
 

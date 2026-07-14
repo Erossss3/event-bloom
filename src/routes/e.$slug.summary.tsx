@@ -43,6 +43,7 @@ function SummaryPage() {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [idx, setIdx] = useState(-1);
+  const END_SCREEN = 9999;
 
   useEffect(() => {
     (async () => {
@@ -70,7 +71,11 @@ function SummaryPage() {
     }, 4000);
     
     const interval = setInterval(() => {
-      setIdx((i) => (i + 1) % photos.length);
+      setIdx((i) => {
+        if (i < photos.length - 1) return i + 1;
+        if (i === photos.length - 1) return END_SCREEN;
+        return END_SCREEN;
+      });
     }, 4200);
 
     return () => {
@@ -106,20 +111,20 @@ function SummaryPage() {
             className="absolute inset-0 flex flex-col items-center justify-center text-center px-8"
           >
 
-            <p className="uppercase tracking-[0.5em] text-sm opacity-70">
-              LiveMoments
-            </p>
-
-            <h1 className="mt-6 font-display text-6xl">
-              {event.title}
+            <h1 className="font-display text-5x1">
+              ✨ Gracias por compartir este momento ✨
             </h1>
 
-            <p className="mt-6 text-xl opacity-80">
-              {new Date(event.starts_at).toLocaleDateString("es-AR")}
-            </p>
+            <div className="mt-10 space-y-3 text-x1">
 
-            <p className="mt-12 text-2xl opacity-90">
-              ✨ Gracias por compartir este momento ✨
+              <p>{photos.length} fotos</p>
+
+              <p>{messages.length} mensajes</p>
+
+            </div>
+
+            <p className="mt-16 text-lg opacity-70">
+              Creado con LiveMoments
             </p>
       
           </motion.div>
@@ -131,18 +136,21 @@ function SummaryPage() {
             src={current.public_url}
             initial={{
               opacity: 0,
-              scale: 1.08,
+              scale: 1.15,
             }}
             animate={{
               opacity: 1,
               scale: 1,
+              x: idx % 2 === 0 ? -15 : 15,
+              y: idx % 3 === 0 ? -10 : 10,
             }}
             exit={{
               opacity: 0,
               scale: 0.96,
             }}
             transition={{
-              duration: 1.5,
+              duration: 4,
+              ease: "easeInOut",
             }}
             className="absolute inset-0 h-full w-full object-contain"
           />

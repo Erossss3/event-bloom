@@ -74,13 +74,29 @@ function LiveScreen() {
   return (
     <div className="relative h-screen w-screen overflow-hidden bg-black">
 
+      <div className="absolute inset-0 overflow-hidden">
+        <img
+          src={photos[index].public_url}
+          className="
+            absolute inset-0
+            h-full w-full
+            object-cover
+            scale-110
+            blur-2xl
+            opacity-40
+          "
+        />
+
+        <div className="absolute inset-0 bg-black/30" />
+      </div>
+
       <img
         key={photos[index].public_url}
         src={photos[index].public_url}
         className="
           absolute inset-0
           h-full w-full
-          object-cover
+          object-contain
           transition-opacity
           duration-1000
         "

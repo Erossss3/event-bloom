@@ -38,6 +38,7 @@ function EventLayout() {
 
   const liveLocked = new Date() < unlockAt;
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isLive = pathname.endsWith("/live");
   const [joinOpen, setJoinOpen] = useState(false);
   const [guestLoaded, setGuestLoaded] = useState(false);
 
@@ -66,7 +67,11 @@ function EventLayout() {
     { to: "/e/$slug/messages", label: "Mensajes", icon: MessageCircle, exact: false },
     { to: "/e/$slug/memories", label: "Recuerdos", icon: Sparkles, exact: false },
   ];
-
+  
+  if (isLive) {
+    return <Outlet/>;
+  }
+  
   return (
     <div className="relative min-h-screen bg-background pb-24">
       <div className="relative h-72 overflow-hidden md:h-96">

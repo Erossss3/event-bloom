@@ -100,7 +100,7 @@ function LiveScreen() {
           object-contain
           transition-all
           duration-2000ms
-          ease-in-put
+          ease-in-out
         "
       />
 

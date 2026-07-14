@@ -42,7 +42,7 @@ function SummaryPage() {
   const palette = STYLE_PALETTES[style ?? "wedding"] ?? STYLE_PALETTES.wedding;
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [messages, setMessages] = useState<Msg[]>([]);
-  const [idx, setIdx] = useState(0);
+  const [idx, setIdx] = useState(-1);
 
   useEffect(() => {
     (async () => {
@@ -64,8 +64,19 @@ function SummaryPage() {
 
   useEffect(() => {
     if (photos.length === 0) return;
-    const t = setInterval(() => setIdx((i) => (i + 1) % photos.length), 4200);
-    return () => clearInterval(t);
+    
+    const first = setTimeout(() => {
+      setIdx(0);
+    }, 4000);
+    
+    const interval = setInterval(() => {
+      setIdx((i) => (i + 1) % photos.length);
+    }, 4200);
+
+    return () => {
+      clearTimeout(first);
+      clearInterval(interval);
+    };
   }, [photos.length]);
 
   const current = photos[idx];
@@ -79,17 +90,66 @@ function SummaryPage() {
       </div>
 
       <AnimatePresence mode="wait">
-        {current ? (
-          <motion.img key={current.id} src={current.public_url}
-            initial={{ opacity: 0, scale: 1.08 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.96 }}
-            transition={{ duration: 1.5 }}
-            className="absolute inset-0 h-full w-full object-contain" />
+        {idx === -1 ? (
+
+          <motion.div
+            key="cover"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1 }}
+            className="absolute inset-0 flex flex-col items-center justify-center text-center px-8"
+          >
+
+            <p className="uppercase tracking-[0.5em] text-sm opacity-70">
+              LiveMoments
+            </p>
+
+            <h1 className="mt-6 font-display text-6xl">
+              {event.title}
+            </h1>
+
+            <p className="mt-6 text-xl opacity-80">
+              {new Date(event.starts_at).toLocaleDateString("es-AR")}
+            </p>
+
+            <p className="mt-12 text-2xl opacity-90">
+              ✨ Gracias por compartir este momento ✨
+            </p>
+      
+          </motion.div>
+
+        ) : current ? (
+
+          <motion.img
+            key={current.id}
+            src={current.public_url}
+            initial={{
+              opacity: 0,
+              scale: 1.08,
+            }}
+            animate={{
+              opacity: 1,
+              scale: 1,
+            }}
+            exit={{
+              opacity: 0,
+              scale: 0.96,
+            }}
+            transition={{
+              duration: 1.5,
+            }}
+            className="absolute inset-0 h-full w-full object-contain"
+          />
+
         ) : (
+
           <div className="flex h-full items-center justify-center">
-            <p className="font-display text-3xl">Aún no hay fotos aprobadas para el resumen.</p>
+            <p className="font-display text-3xl">
+              Aún no hay fotos aprobadas para el resumen.
+            </p>
           </div>
+
         )}
       </AnimatePresence>
 

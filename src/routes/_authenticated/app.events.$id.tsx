@@ -530,20 +530,6 @@ function EventAdminPage() {
             Descargar lista
           </Button>
         </StatCard>
-        <StatCard
-          icon={Users}
-          label="Mesas"
-          value={0}
-        >
-          <Link
-            to="/app/events/$id/tables"
-            params={{ id: event.id }}
-          >
-            <Button className="mt-3 w-full rounded-full">
-              🪑 Gestionar mesas
-            </Button>
-          </Link>
-        </StatCard>
       </div>
 
       <section className="rounded-3xl border bg-card p-6 shadow-soft">

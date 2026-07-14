@@ -1,25 +1,30 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useSearch } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/e/$slug/live")({
-  component: LiveScreen,
+  validateSearch: (search) => ({
+    style: typeof search.style === "string" ? search.style : undefined,
+  }),
+    component: LiveScreen,
 });
 
 function LiveScreen() {
   const { slug } = Route.useParams();
+  const search = useSearch({ from: "/e/$slug/live" });
   const [showCursor, setShowCursor] = useState(true);
   const [fade, setFade] = useState(true);
   const [mosaicIndex, setMosaicIndex] = useState(0);
   const [index, setIndex] = useState(0);
   const qc = useQueryClient();
-  const [flash , setFlash] = useState(false);
   const [isVertical, setIsVertical] = useState(false);
   const [style, setStyle] = useState<
     "elegante" | "minimalista" | "fiesta" | "moderno" | "vertical" | "mosaico2" | "mosaico4"
-  >("mosaico2");
+  >(
+    (search.style as any) ?? "elegante"
+  );
   const liveStyles = {
     elegante: {
         duration: 6000,
@@ -108,11 +113,6 @@ function LiveScreen() {
 
     const timer = setInterval(() => {
       setFade(false);
-      setFlash(true);
-
-      setTimeout(() => {
-        setFlash(false);
-      }, 120);
 
       setTimeout(() => {
         if (style === "mosaico2") {
@@ -122,7 +122,6 @@ function LiveScreen() {
         } else {
           setIndex((i) => (i + 1) % photos.length);
         }
-
         setFade(true);
       }, 1000);
     
@@ -234,8 +233,30 @@ function LiveScreen() {
 
   if (!photos?.length) {
     return (
-      <div className="flex h-screen items-center justify-center bg-black text-white text-xl">
-        Todavía no hay fotos.
+      <div className="relative flex h-screen items-center justify-center overflow-hidden bg-black">
+
+        <div className="absolute inset-0 bg-gradient-to-b from-neutral-900 via-black to-black" />
+
+        <div className="relative z-10 text-center">
+
+          <div className="animate-breathe text-2xl tracking-[0.4em] text-white/80">
+            LiveMoments
+          </div>
+
+          <div className="mt-8 text-5xl">
+            📸
+          </div>
+
+          <h2 className="mt-8 text-3xl font-light text-white">
+            Esperando las primeras fotos
+          </h2>
+
+          <p className="mt-4 text-white/50">
+            Las imágenes aparecerán automáticamente.
+          </p>
+
+        </div>
+  
       </div>
     );
   }
@@ -263,18 +284,6 @@ function LiveScreen() {
           <div className="absolute inset-0 bg-black/30" />
         </div>
       )}
-
-      <div
-        className={`
-          absolute inset-0
-          z-10
-          bg-white
-          pointer-events-none
-          transition-opacity
-          duration-150
-          ${flash ? "opacity-10" : "opacity-0"}
-        `}
-      />
   
     {style === "mosaico2" ? (
       <div className="absolute inset-0 grid grid-cols-2 gap-1">
@@ -328,7 +337,6 @@ function LiveScreen() {
           absolute
           bottom-6
           right-8
-          z-20
           text-sm
           tracking-widest
           text-white/60

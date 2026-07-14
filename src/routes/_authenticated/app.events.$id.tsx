@@ -27,6 +27,17 @@ function EventAdminPage() {
   const qc = useQueryClient();
   const [showRsvps, setShowRsvps] = useState(false);
   const [zipping, setZipping] = useState(false);
+  const [liveDialogOpen, setLiveDialogOpen] = useState(false);
+
+  const [liveStyle, setLiveStyle] = useState<
+    "elegante" |
+    "minimalista" |
+    "moderno" |
+    "fiesta" |
+    "mosaico2" |
+    "mosaico4" |
+    "vertical"
+  >("elegante");
 
   const { data: event } = useQuery({
     queryKey: ["event", id],
@@ -415,7 +426,7 @@ function EventAdminPage() {
             </AlertDialogContent>
           </AlertDialog>
           <Button
-            onClick={() => window.open(`/e/${event.slug}/live`, "_blank")}
+            onClick={() => setLiveDialogOpen(true)}
             className="rounded-full bg-foreground text-background"
           >
             <Tv className="h-4 w-4" />
@@ -515,6 +526,78 @@ function EventAdminPage() {
                </AlertDialogAction>
 
              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+          <AlertDialog
+            open={liveDialogOpen}
+            onOpenChange={setLiveDialogOpen}
+          >
+            <AlertDialogContent className="max-w-xl">
+
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  Elegí el estilo de la pantalla
+                </AlertDialogTitle>
+
+                <AlertDialogDescription>
+                  Podés cambiar la forma en que se mostrarán las fotos durante el evento.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+
+              <div className="grid grid-cols-2 gap-3 py-4">
+
+                {[
+                  ["elegante", "✨ Elegante"],
+                  ["minimalista", "⬛ Minimalista"],
+                  ["moderno", "💎 Moderno"],
+                  ["fiesta", "🎉 Fiesta"],
+                  ["mosaico2", "🖼️ Mosaico x2"],
+                  ["mosaico4", "🧩 Mosaico x4"],
+                  ["vertical", "📱 Vertical"],
+                ].map(([value, label]) => (
+
+                  <button
+                    key={value}
+                    onClick={() => setLiveStyle(value as any)}
+                    className={`
+                      rounded-xl
+                      border
+                      p-4
+                      text-left
+                      transition
+                      ${
+                        liveStyle === value
+                          ? "border-black bg-black text-white"
+                          : "hover:bg-muted"
+                      }
+                    `}
+                  >
+                    {label}
+                  </button>
+
+                ))}
+
+              </div>
+
+              <AlertDialogFooter>
+
+                <AlertDialogCancel>
+                  Cancelar
+                </AlertDialogCancel>
+
+                <AlertDialogAction
+                  onClick={() =>
+                    window.open(
+                      `/e/${event.slug}/live?style=${liveStyle}`,
+                      "_blank"
+                    )
+                  }
+                >
+                  Abrir pantalla
+                </AlertDialogAction>
+
+              </AlertDialogFooter>
+
             </AlertDialogContent>
           </AlertDialog>
         </div>

@@ -232,3 +232,24 @@
 .animate-pan-vertical {
   animation: pan-vertical 10s linear forwards;
 }
+
+@keyframes breathe {
+  0% {
+    opacity: .45;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+
+  100% {
+    opacity: .45;
+    transform: scale(1);
+  }
+}
+
+.animate-breathe {
+  animation: breathe 3.5s ease-in-out infinite;
+}

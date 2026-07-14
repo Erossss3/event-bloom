@@ -18,24 +18,24 @@ function LiveScreen() {
     elegante: {
         duration: 6000,
         animation: "animate-kenburns",
-        transition: "duration-1000",
+        transition: "duration-2000",
     },
 
     minimalista: {
       duration: 7000,
       animation: "",
-      transition: "duration-2000",
+      transition: "duration-3000",
     },
 
     fiesta: {
       duration: 3000,
-      animation: "animate-kenburns",
+      animation: "animate-party",
       transition: "duration-500",
     },
 
     moderno: {
       duration: 5000,
-      animation: "animate-kenburns",
+      animation: "animate-modern",
       transition: "duration-1000",
     },
   };

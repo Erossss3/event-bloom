@@ -15,6 +15,7 @@ function LiveScreen() {
   const [mosaicIndex, setMosaicIndex] = useState(0);
   const [index, setIndex] = useState(0);
   const qc = useQueryClient();
+  const [flash , setFlash] = useState(false);
   const [isVertical, setIsVertical] = useState(false);
   const [style, setStyle] = useState<
     "elegante" | "minimalista" | "fiesta" | "moderno" | "vertical" | "mosaico2" | "mosaico4"
@@ -107,6 +108,11 @@ function LiveScreen() {
 
     const timer = setInterval(() => {
       setFade(false);
+      setFlash(true);
+
+      setTimeout(() => {
+        setFlash(false);
+      }, 120);
 
       setTimeout(() => {
         if (style === "mosaico2") {
@@ -116,6 +122,7 @@ function LiveScreen() {
         } else {
           setIndex((i) => (i + 1) % photos.length);
         }
+
         setFade(true);
       }, 1000);
     
@@ -256,6 +263,18 @@ function LiveScreen() {
           <div className="absolute inset-0 bg-black/30" />
         </div>
       )}
+
+      <div
+        className={`
+          absolute inset-0
+          z-10
+          bg-white
+          pointer-events-none
+          transition-opacity
+          duration-150
+          ${flash ? "opacity-10" : "opacity-0"}
+        `}
+      />
   
     {style === "mosaico2" ? (
       <div className="absolute inset-0 grid grid-cols-2 gap-1">
@@ -309,6 +328,7 @@ function LiveScreen() {
           absolute
           bottom-6
           right-8
+          z-20
           text-sm
           tracking-widest
           text-white/60

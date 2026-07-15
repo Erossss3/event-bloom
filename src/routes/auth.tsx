@@ -71,7 +71,7 @@ function AuthPage() {
   return (
     <div className="grid min-h-screen md:grid-cols-2">
       <div className="hidden bg-gradient-hero p-12 md:flex md:flex-col md:justify-between">
-        <Link to="/"><LiveMomentsLogo /></Link>
+        <Link to="/"><LiveMomentsLogo className="h-12" /></Link>
         <div>
           <p className="text-xs uppercase tracking-[0.3em] text-gold">Para organizadoras</p>
           <h2 className="mt-4 max-w-md font-display text-4xl leading-tight">

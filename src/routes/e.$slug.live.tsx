@@ -238,7 +238,7 @@ function LiveScreen() {
   if (!event) {
     return (
       <div className="flex h-screen w-screen flex-col items-center justify-center bg-black text-white">
-         <LiveMomentsLogo className="h-16 w-auto" />
+         <LiveMomentsLogo className="h-20" />
 
         <div className="mt-8 h-1 w-48 overflow-hidden rounded-full bg-white/10">
           <div className="h-full w-full animate-pulse rounded-full bg-gold" />

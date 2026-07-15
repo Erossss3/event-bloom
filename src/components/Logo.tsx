@@ -1,13 +1,16 @@
 import logoDark from "@/assets/branding/logo-dark.png";
+import logoLight from "@/assets/branding/logo-light.png";
 
 export function LiveMomentsLogo({
   className = "",
+  variant = "dark",
 }: {
   className?: string;
+  variant?: "dark" | "light";
 }) {
   return (
     <img
-      src={logoDark}
+      src={variant === "dark" ? logoDark : logoLight}
       alt="LiveMoments"
       className={className}
       draggable={false}

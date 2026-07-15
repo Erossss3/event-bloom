@@ -238,13 +238,13 @@ function LiveScreen() {
   if (!event) {
     return (
       <div className="flex h-screen w-screen flex-col items-center justify-center bg-black text-white">
-         <LiveMomentsLogo className="h-20" />
+         <LiveMomentsLogo variant="light" className="h-28 drop-shadow-2x1 animate-fade-in" />
 
         <div className="mt-8 h-1 w-48 overflow-hidden rounded-full bg-white/10">
           <div className="h-full w-full animate-pulse rounded-full bg-gold" />
         </div>
 
-        <p className="mt-6 text-sm tracking-[0.3em] text-white/60 uppercase">
+        <p className="mt-8 text-xs uppercase tracking-[0.45em] text-white/50">
           Preparando pantalla...
         </p>
       </div>
@@ -259,9 +259,10 @@ function LiveScreen() {
 
         <div className="relative z-10 text-center">
 
-          <div className="animate-breathe text-2xl tracking-[0.4em] text-white/80">
-            LiveMoments
-          </div>
+          <LiveMomentsLogo
+            variant="light"
+            className="mx-auto h-20 opacity-90"
+          />
 
           <div className="mt-8 text-5xl">
             📸
@@ -352,17 +353,11 @@ function LiveScreen() {
     
         )}
 
-      <div
-        className="
-          absolute
-          bottom-6
-          right-8
-          text-sm
-          tracking-widest
-          text-white/60
-        "
-      >
-        LiveMoments
+      <div className="absolute bottom-6 right-8 opacity-70">
+        <LiveMomentsLogo
+          variant="light"
+          className="h-8"
+        />
       </div>
 
     </div>

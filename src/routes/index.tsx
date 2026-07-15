@@ -23,7 +23,7 @@ const FEATURES = [
 function LandingPage() {
   return (
     <div className="min-h-screen bg-background">
-      <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
+      <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-7">
         <Link to="/"><LiveMomentsLogo className="h-12" /></Link>
         <nav className="flex items-center gap-3">
           <Link to="/auth" className="text-sm text-muted-foreground hover:text-foreground">Ingresar</Link>

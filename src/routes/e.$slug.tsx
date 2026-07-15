@@ -8,6 +8,7 @@ import { Calendar, Camera, Heart, Home, MapPin, MessageCircle, Sparkles } from "
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { LiveLockDialog } from "@/components/LiveLockDialog";
+import { LiveMomentsLogo } from "@/components/Logo";
 
 export const Route = createFileRoute("/e/$slug")({
   loader: async ({ params }) => {
@@ -19,12 +20,12 @@ export const Route = createFileRoute("/e/$slug")({
   },
   head: ({ loaderData }) => ({
     meta: loaderData ? [
-      { title: `${loaderData.event.title} — Momento` },
+      { title: `${loaderData.event.title} — LiveMoments` },
       { name: "description", content: loaderData.event.description ?? "Sumate al evento y viví cada momento." },
       { property: "og:title", content: loaderData.event.title },
       { property: "og:description", content: loaderData.event.description ?? "" },
       ...(loaderData.event.cover_url ? [{ property: "og:image", content: loaderData.event.cover_url }] : []),
-    ] : [{ title: "Evento — Momento" }],
+    ] : [{ title: "Evento — LiveMoments" }],
   }),
   component: EventLayout,
 });
@@ -78,10 +79,15 @@ function EventLayout() {
         {event.cover_url
           ? <img src={event.cover_url} alt="" className="h-full w-full object-cover" />
           : <div className="h-full w-full bg-gradient-hero" />}
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
-        <div className="absolute inset-x-0 bottom-0 mx-auto max-w-4xl px-6 pb-8">
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-black/20" />
+        <div className="absolute left-6 top-6 z-20">
+          <Link to="/">
+            <LiveMomentsLogo variant="light" className="h-12 drop-shado-x1"/>
+          </Link>
+        </div>
+        <div className="absolute inset-x-0 bottom-0 mx-auto max-w-4xl px-6 pb-10">
           <p className="text-xs uppercase tracking-[0.4em] text-gold">{event.event_type ?? "Evento"}</p>
-          <h1 className="mt-2 font-display text-4xl leading-tight md:text-6xl">{event.title}</h1>
+          <h1 className="mt-3 font-display text-5xl leading-tight md:text-6xl">{event.title}</h1>
           <div className="mt-3 flex flex-wrap gap-4 text-sm text-muted-foreground">
             <span className="inline-flex items-center gap-1"><Calendar className="h-4 w-4" />{format(new Date(event.starts_at), "d 'de' MMMM · HH:mm", { locale: es })}</span>
             {event.location_name && <span className="inline-flex items-center gap-1"><MapPin className="h-4 w-4" />{event.location_name}</span>}

@@ -13,7 +13,7 @@ const searchSchema = z.object({ redirect: z.string().optional() });
 
 export const Route = createFileRoute("/auth")({
   validateSearch: searchSchema,
-  head: () => ({ meta: [{ title: "Ingresar — Momento" }] }),
+  head: () => ({ meta: [{ title: "Ingresar — LiveMoments" }] }),
   component: AuthPage,
 });
 
@@ -70,7 +70,7 @@ function AuthPage() {
 
   return (
     <div className="grid min-h-screen md:grid-cols-2">
-      <div className="hidden bg-gradient-hero p-12 md:flex md:flex-col md:justify-between">
+      <div className="hidden bg-gradient-hero p-14 md:flex md:flex-col md:justify-between">
         <Link to="/"><LiveMomentsLogo className="h-12" /></Link>
         <div>
           <p className="text-xs uppercase tracking-[0.3em] text-gold">Para organizadoras</p>

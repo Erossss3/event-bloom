@@ -149,11 +149,15 @@ function RsvpStandalone() {
         {event.cover_url
           ? <img src={event.cover_url} alt="" className="h-full w-full object-cover" />
           : <div className="h-full w-full bg-gradient-hero" />}
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
-        <div className="absolute left-6 top-6"><LiveMomentsLogo /></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-black/20" />
+        <div className="absolute left-6 top-6">
+          <Link to="/">
+            <LiveMomentsLogo variant="light" className="h-14 drop-shadow-x1" />
+          </Link>
+        </div>
         <div className="absolute inset-x-0 bottom-0 mx-auto max-w-2xl px-6 pb-6">
           <p className="text-xs uppercase tracking-[0.4em] text-gold">Confirmá tu asistencia</p>
-          <h1 className="mt-2 font-display text-3xl leading-tight md:text-4xl">{event.title}</h1>
+          <h1 className="mt-2 font-display text-3xl leading-tight md:text-5xl">{event.title}</h1>
           <div className="mt-2 flex flex-wrap gap-4 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-1"><Calendar className="h-3.5 w-3.5" />
               {format(new Date(event.starts_at), "d 'de' MMMM · HH:mm", { locale: es })}

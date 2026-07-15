@@ -31,7 +31,7 @@ function AppShell() {
     <div className="min-h-screen bg-background">
       <header className="border-b bg-background/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-          <Link to="/app"><LiveMomentsLogo className="h-12" /></Link>
+          <Link to="/app"><LiveMomentsLogo className="h-14" /></Link>
           <nav className="hidden items-center gap-1 md:flex">
             {nav.map((n) => {
               const active = n.exact ? pathname === n.to : pathname.startsWith(n.to);

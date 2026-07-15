@@ -12,7 +12,7 @@ export function LiveMomentsLogo({
     <img
       src={variant === "dark" ? logoDark : logoLight}
       alt="LiveMoments"
-      className={`h-8 w-auto object-contain ${className}`}
+      className={`w-auto object-contain ${className}`}
       draggable={false}
     />
   );

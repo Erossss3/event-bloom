@@ -427,7 +427,7 @@ function EventAdminPage() {
           </AlertDialog>
           <Button
             onClick={() => setLiveDialogOpen(true)}
-            className="rounded-full bg-foreground text-background"
+            className="rounded-full bg-foreground text-background transition-opacity hover:opacity-90"
           >
             <Tv className="h-4 w-4" />
             Pantalla en vivo
@@ -440,7 +440,7 @@ function EventAdminPage() {
               <AlertDialogTrigger asChild>
                 <Button
                   disabled={finalize.isPending}
-                  className="rounded-full bg-gradient-gold text-primary-foreground"
+                  className="rounded-full bg-gradient-gold text-primary-foreground shadow-elegant transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:translate-y-0"
                 >
                   <CheckCircle2 className="mr-2 h-4 w-4" />
                   Finalizar evento
@@ -483,10 +483,7 @@ function EventAdminPage() {
           
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button
-               variant="destructive"
-                className="rounded-full bg-gradient-gold text-primary-foreground"
-              >
+              <Button variant="destructive" className="rounded-full">
                  Eliminar evento
               </Button>
             </AlertDialogTrigger>
@@ -544,7 +541,7 @@ function EventAdminPage() {
                 </AlertDialogDescription>
               </AlertDialogHeader>
 
-              <div className="grid grid-cols-2 gap-3 py-4">
+              <div className="grid grid-cols-1 gap-3 py-4 sm:grid-cols-2">
 
                 {[
                   ["elegante", "✨ Elegante"],
@@ -564,10 +561,10 @@ function EventAdminPage() {
                       border
                       p-4
                       text-left
-                      transition
+                      transition-colors
                       ${
                         liveStyle === value
-                          ? "border-black bg-black text-white"
+                          ? "border-gold bg-gradient-gold text-primary-foreground shadow-elegant"
                           : "hover:bg-muted"
                       }
                     `}
@@ -607,16 +604,21 @@ function EventAdminPage() {
         <StatCard icon={Users} label="Invitados" value={stats?.guests ?? 0} />
         <StatCard icon={Camera} label="Fotos & videos" value={stats?.gallery ?? 0} />
         <StatCard icon={MessageCircle} label="Mensajes" value={stats?.messages ?? 0} />
-        <StatCard 
-          icon={Sparkles} 
-          label="Confirmados" 
-          value={stats?.confirmed ?? 0} 
-          sub={`${stats?.declined ?? 0} no asisten`}
-        >
-          <Button variant="outline" size="sm" className="mt-3 rounded-full" onClick={downloadConfirmationsPDF}>
-            Descargar lista
+        <div className="rounded-2xl border bg-card p-5 shadow-soft">
+          <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-muted-foreground">
+            <Sparkles className="h-4 w-4" /> Confirmaciones
+          </div>
+          <Button
+            className="mt-3 w-full rounded-full bg-gradient-gold text-primary-foreground shadow-elegant"
+            size="sm"
+            onClick={downloadConfirmationsPDF}
+          >
+            <Download className="mr-2 h-3.5 w-3.5" /> Descargar lista
           </Button>
-        </StatCard>
+          <p className="mt-3 text-xs text-muted-foreground">
+            {stats?.confirmed ?? 0} confirmados · {stats?.declined ?? 0} no asisten
+          </p>
+        </div>
       </div>
 
       <section className="rounded-3xl border bg-card p-6 shadow-soft">
@@ -696,6 +698,20 @@ function EventAdminPage() {
           <Button onClick={downloadZip} disabled={zipping} variant="outline" className="rounded-full">
             <Download className="mr-2 h-4 w-4" /> {zipping ? "Preparando ZIP…" : "Descargar álbum (ZIP)"}
           </Button>
+        </div>
+      </section>
+
+      <section className="rounded-3xl border bg-card p-6 shadow-soft">
+        <h2 className="font-display text-2xl">
+          Mensajes
+        </h2>
+
+        <p className="text-sm text-muted-foreground">
+          Destacá los mensajes más lindos para el video resumen.
+        </p>
+
+        <div className="mt-6">
+          <AdminMessages eventId={id} />
         </div>
       </section>
 

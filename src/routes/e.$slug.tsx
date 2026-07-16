@@ -82,7 +82,7 @@ function EventLayout() {
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-black/20" />
         <div className="absolute left-6 top-6 z-20">
           <Link to="/">
-            <LiveMomentsLogo variant="light" className="h-12 drop-shado-x1"/>
+            <LiveMomentsLogo variant={event.cover_url ? "light" : "dark"} className="h-12 drop-shadow-xl"/>
           </Link>
         </div>
         <div className="absolute inset-x-0 bottom-0 mx-auto max-w-4xl px-6 pb-10">

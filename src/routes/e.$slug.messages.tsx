@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
+import { MessageCircleHeart } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 import { getRouteApi } from "@tanstack/react-router";
@@ -80,7 +81,7 @@ function MessagesPage() {
               </button>
             ))}
           </div>
-          <Button type="submit" disabled={sending || body.trim().length === 0} className="rounded-full bg-gradient-gold text-primary-foreground">
+          <Button type="submit" disabled={sending || body.trim().length === 0} className="rounded-full bg-gradient-gold text-primary-foreground shadow-elegant transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:translate-y-0">
             Enviar mensaje
           </Button>
         </form>
@@ -102,7 +103,13 @@ function MessagesPage() {
             </motion.li>
           ))}
         </AnimatePresence>
-        {msgs.length === 0 && <p className="text-center text-sm text-muted-foreground">Aún no hay mensajes. Sé el primero.</p>}
+        {msgs.length === 0 && (
+          <li className="rounded-3xl border bg-cream/40 p-12 text-center list-none">
+            <MessageCircleHeart className="mx-auto h-10 w-10 text-muted-foreground" />
+            <p className="mt-4 font-display text-2xl">Sé el primero en escribir</p>
+            <p className="mt-2 text-sm text-muted-foreground">Aún no hay mensajes para este evento.</p>
+          </li>
+        )}
       </ul>
     </div>
   );

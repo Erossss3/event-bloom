@@ -34,7 +34,7 @@ function DashboardPage() {
         </div>
         <Link
           to="/app/events/new"
-          className="inline-flex items-center gap-2 rounded-full bg-gradient-gold px-5 py-3 text-sm font-medium text-primary-foreground shadow-elegant"
+          className="inline-flex items-center gap-2 rounded-full bg-gradient-gold px-5 py-3 text-sm font-medium text-primary-foreground shadow-elegant transition-all hover:-translate-y-0.5 hover:shadow-lg"
         >
           <PlusCircle className="h-4 w-4" /> Crear evento
         </Link>
@@ -46,9 +46,10 @@ function DashboardPage() {
         ))}
         {events && events.length === 0 && (
           <div className="col-span-full rounded-3xl border bg-cream/40 p-12 text-center">
-            <h3 className="font-display text-2xl">Aún no tenés eventos</h3>
+            <Calendar className="mx-auto h-10 w-10 text-muted-foreground" />
+            <h3 className="mt-4 font-display text-2xl">Aún no tenés eventos</h3>
             <p className="mt-2 text-sm text-muted-foreground">Empezá creando tu primer evento. Toma menos de 2 minutos.</p>
-            <Link to="/app/events/new" className="mt-6 inline-flex items-center gap-2 rounded-full bg-foreground px-6 py-3 text-sm text-background">
+            <Link to="/app/events/new" className="mt-6 inline-flex items-center gap-2 rounded-full bg-foreground px-6 py-3 text-sm text-background transition-opacity hover:opacity-90">
               <PlusCircle className="h-4 w-4" /> Crear mi primer evento
             </Link>
           </div>
@@ -59,16 +60,17 @@ function DashboardPage() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05 }}
-            className="group relative overflow-hidden rounded-2xl border bg-card shadow-soft"
+            className="group relative overflow-hidden rounded-2xl border bg-card shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-elegant"
           >
             {e.cover_url ? (
-              <img src={e.cover_url} alt="" className="h-40 w-full object-cover" />
+              <img src={e.cover_url} alt="" className="h-40 w-full object-cover transition-transform duration-500 group-hover:scale-105" />
             ) : (
               <div className="h-40 w-full bg-gradient-hero" />
             )}
             <div className="p-5">
               <div className="flex items-center gap-2">
-                <span className="inline-flex items-center rounded-full bg-accent px-2.5 py-0.5 text-xs">
+                <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs ${statusStyle(e.status)}`}>
+                  {e.status === "live" && <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-current" />}
                   {statusLabel(e.status)}
                 </span>
               </div>
@@ -107,4 +109,14 @@ function DashboardPage() {
 
 function statusLabel(s: string) {
   return { draft: "Borrador", published: "Publicado", live: "En vivo", finished: "Finalizado", archived: "Archivado" }[s] ?? s;
+}
+
+function statusStyle(s: string) {
+  return {
+    draft: "bg-muted text-muted-foreground",
+    published: "bg-accent text-accent-foreground",
+    live: "bg-gold/15 text-gold border border-gold/40 font-medium",
+    finished: "bg-secondary text-secondary-foreground",
+    archived: "bg-muted/60 text-muted-foreground",
+  }[s] ?? "bg-accent text-accent-foreground";
 }

@@ -45,7 +45,7 @@ function EventHome() {
         </div>
       )}
 
-      <div className="grid gap-3 md:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2">
         <ActionCard slug={slug} to="/e/$slug/gallery" icon={Camera} label="Fotos & videos" />
         <ActionCard slug={slug} to="/e/$slug/messages" icon={MessageCircle} label="Dejar un mensaje" />
       </div>

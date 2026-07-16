@@ -58,7 +58,7 @@ export function GuestJoinDialog({
             <Label htmlFor="last">Apellido <span className="text-muted-foreground">(opcional)</span></Label>
             <Input id="last" value={last} onChange={(e) => setLast(e.target.value)} />
           </div>
-          <Button type="submit" disabled={saving || first.trim().length === 0} className="w-full rounded-full bg-gradient-gold text-primary-foreground">
+          <Button type="submit" disabled={saving || first.trim().length === 0} className="w-full rounded-full bg-gradient-gold text-primary-foreground shadow-elegant transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:translate-y-0">
             {saving ? "Un momento…" : "Unirme"}
           </Button>
         </form>

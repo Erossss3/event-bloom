@@ -89,7 +89,7 @@ function GalleryPage() {
             <h2 className="font-display text-2xl">Galería colaborativa</h2>
             <p className="text-sm text-muted-foreground">Compartí las fotos y videos del evento.</p>
           </div>
-          <label className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-gradient-gold px-5 py-3 text-sm font-medium text-primary-foreground shadow-elegant">
+          <label className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-gradient-gold px-5 py-3 text-sm font-medium text-primary-foreground shadow-elegant transition-all hover:-translate-y-0.5 hover:shadow-lg aria-disabled:pointer-events-none aria-disabled:opacity-70" aria-disabled={uploading}>
             <Upload className="h-4 w-4" /> {uploading ? `Subiendo ${progress}%` : "Subir fotos / videos"}
             <input type="file" multiple accept="image/*,video/*" className="hidden" onChange={(e) => onFiles(e.target.files)} disabled={uploading} />
           </label>
@@ -111,7 +111,7 @@ function GalleryPage() {
                 ? <video src={it.public_url} controls className="aspect-square w-full object-cover" />
                 : <img src={it.public_url} loading="lazy" className="aspect-square w-full object-cover" alt="" />}
               <button onClick={() => react(it.id)}
-                className="absolute bottom-2 right-2 rounded-full bg-black/60 p-2 text-white backdrop-blur opacity-0 transition group-hover:opacity-100">
+                className="absolute bottom-2 right-2 rounded-full bg-black/60 p-2 text-white backdrop-blur opacity-100 transition md:opacity-0 md:group-hover:opacity-100">
                 <Heart className="h-3.5 w-3.5" />
               </button>
             </motion.div>

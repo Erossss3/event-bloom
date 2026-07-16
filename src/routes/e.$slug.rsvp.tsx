@@ -146,7 +146,7 @@ function RsvpPage() {
         <Textarea id="nt" rows={3} value={note} onChange={(e) => setNote(e.target.value)} />
       </div>
 
-      <Button type="submit" disabled={saving} className="w-full rounded-full bg-gradient-gold text-primary-foreground">
+      <Button type="submit" disabled={saving} className="w-full rounded-full bg-gradient-gold text-primary-foreground shadow-elegant transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:translate-y-0">
         {saving ? "Guardando…" : existingId ? "Actualizar" : "Confirmar"}
       </Button>
     </form>

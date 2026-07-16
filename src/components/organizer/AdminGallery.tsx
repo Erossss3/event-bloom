@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Star, StarOff, Trash2, Check, X } from "lucide-react";
+import { Star, StarOff, Trash2, Check, X, ImageOff } from "lucide-react";
 import { toast } from "sonner";
 
 interface Row {
@@ -37,7 +37,13 @@ export function AdminGallery({ eventId }: { eventId: string }) {
     if (error) toast.error(error.message); else load();
   }
 
-  if (rows.length === 0) return <p className="text-sm text-muted-foreground">Aún no hay fotos subidas.</p>;
+  if (rows.length === 0) return (
+    <div className="rounded-2xl border border-dashed bg-cream/40 p-10 text-center">
+      <ImageOff className="mx-auto h-8 w-8 text-muted-foreground" />
+      <p className="mt-3 font-display text-lg">Aún no hay fotos subidas</p>
+      <p className="mt-1 text-sm text-muted-foreground">Cuando tus invitados suban contenido, vas a poder moderarlo acá.</p>
+    </div>
+  );
 
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
@@ -48,7 +54,7 @@ export function AdminGallery({ eventId }: { eventId: string }) {
             : <img src={r.public_url} className="aspect-square w-full object-cover" alt="" />}
           {r.featured && <div className="absolute left-2 top-2 rounded-full bg-gold px-2 py-0.5 text-[10px] font-medium text-primary-foreground">Destacada</div>}
           {r.moderation === "rejected" && <div className="absolute left-2 top-2 rounded-full bg-destructive px-2 py-0.5 text-[10px] text-destructive-foreground">Oculta</div>}
-          <div className="absolute inset-x-0 bottom-0 flex justify-center gap-1 bg-gradient-to-t from-black/70 to-transparent p-2 opacity-0 transition group-hover:opacity-100">
+          <div className="absolute inset-x-0 bottom-0 flex justify-center gap-1 bg-gradient-to-t from-black/70 to-transparent p-2 opacity-100 transition md:opacity-0 md:group-hover:opacity-100 md:focus-within:opacity-100">
             <Button size="sm" variant="secondary" className="h-8 w-8 p-0" onClick={() => toggleFeatured(r.id, r.featured)}>
               {r.featured ? <StarOff className="h-3.5 w-3.5" /> : <Star className="h-3.5 w-3.5" />}
             </Button>

@@ -26,8 +26,8 @@ function LandingPage() {
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-7">
         <Link to="/"><LiveMomentsLogo className="h-12" /></Link>
         <nav className="flex items-center gap-3">
-          <Link to="/auth" className="text-sm text-muted-foreground hover:text-foreground">Ingresar</Link>
-          <Link to="/auth" className="rounded-full bg-foreground px-5 py-2 text-sm text-background hover:opacity-90">
+          <Link to="/auth" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Ingresar</Link>
+          <Link to="/auth" className="rounded-full bg-foreground px-5 py-2 text-sm text-background transition-all hover:-translate-y-0.5 hover:opacity-90 hover:shadow-elegant">
             Empezar
           </Link>
         </nav>
@@ -52,11 +52,11 @@ function LandingPage() {
             <div className="mt-10 flex flex-wrap items-center gap-3">
               <Link
                 to="/auth"
-                className="inline-flex items-center gap-2 rounded-full bg-gradient-gold px-7 py-3.5 text-sm font-medium text-primary-foreground shadow-elegant hover:opacity-95"
+                className="inline-flex items-center gap-2 rounded-full bg-gradient-gold px-7 py-3.5 text-sm font-medium text-primary-foreground shadow-elegant transition-all hover:-translate-y-0.5 hover:opacity-95 hover:shadow-lg"
               >
-                Crear mi evento <ArrowRight className="h-4 w-4" />
+                Crear mi evento <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
-              <a href="#como-funciona" className="inline-flex items-center gap-2 rounded-full border px-6 py-3.5 text-sm hover:bg-accent">
+              <a href="#como-funciona" className="inline-flex items-center gap-2 rounded-full border px-6 py-3.5 text-sm transition-colors hover:bg-accent">
                 <Play className="h-4 w-4" /> Cómo funciona
               </a>
             </div>
@@ -78,7 +78,7 @@ function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.08 }}
-                className="rounded-2xl border bg-card p-6 shadow-soft"
+                className="rounded-2xl border bg-card p-6 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-elegant"
               >
                 <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-gold text-primary-foreground">
                   <f.icon className="h-5 w-5" />
@@ -98,7 +98,7 @@ function LandingPage() {
         </p>
         <Link
           to="/auth"
-          className="mt-8 inline-flex items-center gap-2 rounded-full bg-gradient-gold px-8 py-4 text-sm font-medium text-primary-foreground shadow-elegant"
+          className="mt-8 inline-flex items-center gap-2 rounded-full bg-gradient-gold px-8 py-4 text-sm font-medium text-primary-foreground shadow-elegant transition-all hover:-translate-y-0.5 hover:shadow-lg"
         >
           Comenzar gratis <ArrowRight className="h-4 w-4" />
         </Link>

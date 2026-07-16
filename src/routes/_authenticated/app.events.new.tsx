@@ -11,7 +11,7 @@ import { slugify, randomSuffix } from "@/lib/slug";
 import { uploadToBucket } from "@/lib/storage";
 
 export const Route = createFileRoute("/_authenticated/app/events/new")({
-  head: () => ({ meta: [{ title: "Nuevo evento — Momento" }] }),
+  head: () => ({ meta: [{ title: "Nuevo evento — LiveMoments" }] }),
   component: NewEventPage,
 });
 
@@ -129,7 +129,7 @@ function NewEventPage() {
           </div>
         </div>
 
-        <Button type="submit" disabled={saving} className="w-full rounded-full bg-gradient-gold text-primary-foreground">
+        <Button type="submit" disabled={saving} className="w-full rounded-full bg-gradient-gold text-primary-foreground shadow-elegant transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:translate-y-0">
           {saving ? "Creando…" : "Crear y publicar"}
         </Button>
       </form>

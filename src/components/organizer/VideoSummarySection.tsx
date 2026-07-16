@@ -77,7 +77,7 @@ export function VideoSummarySection({ eventId, slug, finished }: { eventId: stri
       </div>
 
       <Button disabled={create.isPending} onClick={() => create.mutate(selected)}
-        className="rounded-full bg-gradient-gold text-primary-foreground">
+        className="rounded-full bg-gradient-gold text-primary-foreground shadow-elegant transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:translate-y-0">
         {create.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
         Generar video resumen
       </Button>

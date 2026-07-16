@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Star, Trash2 } from "lucide-react";
+import { Star, Trash2, MessageCircleHeart } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 
@@ -27,27 +27,35 @@ export function AdminMessages({ eventId }: { eventId: string }) {
     load();
   }
 
-  if (rows.length === 0) return <p className="text-sm text-muted-foreground">Aún no hay mensajes.</p>;
+  if (rows.length === 0) return (
+    <div className="rounded-2xl border border-dashed bg-cream/40 p-10 text-center">
+      <MessageCircleHeart className="mx-auto h-8 w-8 text-muted-foreground" />
+      <p className="mt-3 font-display text-lg">Aún no hay mensajes</p>
+      <p className="mt-1 text-sm text-muted-foreground">Los mensajes de tus invitados van a aparecer acá para que los destaques.</p>
+    </div>
+  );
 
   return (
     <ul className="space-y-3">
       {rows.map((m) => (
-        <li key={m.id} className={`flex items-start gap-3 rounded-xl border p-4 ${m.featured ? "border-gold bg-gold-soft/30" : ""}`}>
-          <div className="flex-1">
-            <div className="flex items-center gap-2 text-sm">
+        <li key={m.id} className={`flex flex-col gap-3 rounded-xl border p-4 sm:flex-row sm:items-start ${m.featured ? "border-gold bg-gold-soft/30" : ""}`}>
+          <div className="flex-1 min-w-0">
+            <div className="flex flex-wrap items-center gap-2 text-sm">
               <strong>{m.author_name}</strong>
               <span className="text-xs text-muted-foreground">
                 {formatDistanceToNow(new Date(m.created_at), { addSuffix: true, locale: es })}
               </span>
             </div>
-            <p className="mt-1">{m.emoji ? `${m.emoji} ` : ""}{m.body}</p>
+            <p className="mt-1 break-words">{m.emoji ? `${m.emoji} ` : ""}{m.body}</p>
           </div>
-          <Button size="sm" variant={m.featured ? "default" : "outline"} className="h-8 w-8 p-0" onClick={() => toggleFeatured(m.id, m.featured)}>
-            <Star className="h-3.5 w-3.5" />
-          </Button>
-          <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={() => remove(m.id)}>
-            <Trash2 className="h-3.5 w-3.5" />
-          </Button>
+          <div className="flex shrink-0 gap-2 self-end sm:self-start">
+            <Button size="sm" variant={m.featured ? "default" : "outline"} className="h-8 w-8 p-0" onClick={() => toggleFeatured(m.id, m.featured)}>
+              <Star className="h-3.5 w-3.5" />
+            </Button>
+            <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={() => remove(m.id)}>
+              <Trash2 className="h-3.5 w-3.5" />
+            </Button>
+          </div>
         </li>
       ))}
     </ul>

@@ -71,7 +71,7 @@ function AuthPage() {
   return (
     <div className="grid min-h-screen md:grid-cols-2">
       <div className="hidden bg-gradient-hero p-14 md:flex md:flex-col md:justify-between">
-        <Link to="/"><LiveMomentsLogo className="h-12" /></Link>
+        <Link to="/"><LiveMomentsLogo className="h-14" /></Link>
         <div>
           <p className="text-xs uppercase tracking-[0.3em] text-gold">Para organizadoras</p>
           <h2 className="mt-4 max-w-md font-display text-4xl leading-tight">
@@ -116,7 +116,7 @@ function AuthPage() {
               <Label htmlFor="password">Contraseña</Label>
               <Input id="password" type="password" minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} required />
             </div>
-            <Button type="submit" disabled={loading} className="w-full rounded-full bg-gradient-gold text-primary-foreground">
+            <Button type="submit" disabled={loading} className="w-full rounded-full bg-gradient-gold text-primary-foreground shadow-elegant transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:translate-y-0 disabled:opacity-70">
               {loading ? "Un momento…" : mode === "signin" ? "Ingresar" : "Crear cuenta"}
             </Button>
           </form>

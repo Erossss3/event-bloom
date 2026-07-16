@@ -84,7 +84,7 @@ function MemoriesPage() {
           <Label htmlFor="mf">Adjuntá foto, video o audio</Label>
           <Input id="mf" type="file" accept="image/*,video/*,audio/*" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
         </div>
-        <Button type="submit" disabled={saving} className="rounded-full bg-gradient-gold text-primary-foreground">
+        <Button type="submit" disabled={saving} className="rounded-full bg-gradient-gold text-primary-foreground shadow-elegant transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:translate-y-0">
           {saving ? "Enviando…" : "Compartir recuerdo"}
         </Button>
       </form>

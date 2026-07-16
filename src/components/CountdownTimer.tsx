@@ -17,16 +17,16 @@ export function CountdownTimer({ target }: { target: string }) {
   const seconds = Math.floor((diff % 60000) / 1000);
 
   return (
-    <div className="mt-3 grid grid-cols-4 gap-3">
+    <div className="mt-3 grid grid-cols-4 gap-1.5 sm:gap-3">
       {[
         { v: days, l: "días" },
         { v: hours, l: "horas" },
         { v: minutes, l: "min" },
         { v: seconds, l: "seg" },
       ].map((x) => (
-        <div key={x.l} className="rounded-2xl bg-card/60 p-3 text-center backdrop-blur">
-          <div className="font-display text-3xl tabular-nums">{String(x.v).padStart(2, "0")}</div>
-          <div className="text-[10px] uppercase tracking-widest text-muted-foreground">{x.l}</div>
+        <div key={x.l} className="rounded-xl bg-card/60 p-2 text-center backdrop-blur sm:rounded-2xl sm:p-3">
+          <div className="font-display text-xl tabular-nums sm:text-3xl">{String(x.v).padStart(2, "0")}</div>
+          <div className="text-[9px] uppercase tracking-widest text-muted-foreground sm:text-[10px]">{x.l}</div>
         </div>
       ))}
     </div>

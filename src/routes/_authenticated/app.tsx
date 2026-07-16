@@ -31,25 +31,26 @@ function AppShell() {
     <div className="min-h-screen bg-background">
       <header className="border-b bg-background/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-          <Link to="/app"><LiveMomentsLogo className="h-14" /></Link>
-          <nav className="hidden items-center gap-1 md:flex">
+          <Link to="/app" className="shrink-0"><LiveMomentsLogo className="h-10 md:h-14" /></Link>
+          <nav className="flex items-center gap-1">
             {nav.map((n) => {
               const active = n.exact ? pathname === n.to : pathname.startsWith(n.to);
               return (
                 <Link
                   key={n.to}
                   to={n.to}
-                  className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm transition ${
+                  title={n.label}
+                  className={`inline-flex items-center gap-2 rounded-full px-2.5 py-2 text-sm transition-colors md:px-4 ${
                     active ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  <n.icon className="h-4 w-4" /> {n.label}
+                  <n.icon className="h-4 w-4" /> <span className="hidden md:inline">{n.label}</span>
                 </Link>
               );
             })}
           </nav>
-          <button onClick={signOut} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-            <LogOut className="h-4 w-4" /> Salir
+          <button onClick={signOut} title="Salir" className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground">
+            <LogOut className="h-4 w-4" /> <span className="hidden md:inline">Salir</span>
           </button>
         </div>
       </header>

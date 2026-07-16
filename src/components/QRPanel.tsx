@@ -40,10 +40,10 @@ export function QRPanel({ url, title }: { url: string; title: string }) {
   }
 
   return (
-    <div className="grid gap-6 md:grid-cols-[1fr] justify-item-center">
-      <div className="mx-auto rounded-3xl border bg-white p-8 shadow-elegant">
+    <div className="grid gap-6 justify-items-center md:grid-cols-[1fr]">
+      <div className="mx-auto w-full max-w-[280px] rounded-3xl border bg-white p-5 shadow-elegant sm:p-8">
         <div ref={canvasRef} className="hidden"><QRCodeCanvas value={url} size={512} includeMargin /></div>
-        <div ref={svgRef}>
+        <div ref={svgRef} className="[&>svg]:h-auto [&>svg]:w-full">
           <QRCodeSVG value={url} size={280} includeMargin bgColor="#ffffff" fgColor="#1a1508" />
         </div>
       </div>
@@ -53,7 +53,7 @@ export function QRPanel({ url, title }: { url: string; title: string }) {
           <p className="mt-1 break-all font-mono text-sm">{url}</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button onClick={downloadPNG} className="rounded-full bg-gradient-gold text-primary-foreground">
+          <Button onClick={downloadPNG} className="rounded-full bg-gradient-gold text-primary-foreground transition-all hover:-translate-y-0.5 hover:shadow-lg">
             <Download className="mr-2 h-4 w-4" /> PNG
           </Button>
           <Button variant="outline" onClick={downloadSVG} className="rounded-full">

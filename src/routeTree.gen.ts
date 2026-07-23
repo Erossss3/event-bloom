@@ -13,11 +13,16 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RSlugRouteImport } from './routes/r.$slug'
+import { Route as LegalTerminosRouteImport } from './routes/legal.terminos'
+import { Route as LegalPrivacidadRouteImport } from './routes/legal.privacidad'
+import { Route as LegalEliminarDatosRouteImport } from './routes/legal.eliminar-datos'
+import { Route as LegalCookiesRouteImport } from './routes/legal.cookies'
 import { Route as ESlugRouteImport } from './routes/e.$slug'
+import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
+import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
 import { Route as ESlugIndexRouteImport } from './routes/e.$slug.index'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
-import { Route as ESlugSummaryRouteImport } from './routes/e.$slug.summary'
 import { Route as ESlugRsvpRouteImport } from './routes/e.$slug.rsvp'
 import { Route as ESlugMessagesRouteImport } from './routes/e.$slug.messages'
 import { Route as ESlugMemoriesRouteImport } from './routes/e.$slug.memories'
@@ -25,6 +30,8 @@ import { Route as ESlugLiveRouteImport } from './routes/e.$slug.live'
 import { Route as ESlugGalleryRouteImport } from './routes/e.$slug.gallery'
 import { Route as AuthenticatedAppEventsNewRouteImport } from './routes/_authenticated/app.events.new'
 import { Route as AuthenticatedAppEventsIdRouteImport } from './routes/_authenticated/app.events.$id'
+import { Route as AuthenticatedAppEventsIdTablesRouteImport } from './routes/_authenticated/app.events.$id.tables'
+import { Route as AuthenticatedAppEventsIdMessagesRouteImport } from './routes/_authenticated/app.events.$id.messages'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -45,10 +52,40 @@ const RSlugRoute = RSlugRouteImport.update({
   path: '/r/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LegalTerminosRoute = LegalTerminosRouteImport.update({
+  id: '/legal/terminos',
+  path: '/legal/terminos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalPrivacidadRoute = LegalPrivacidadRouteImport.update({
+  id: '/legal/privacidad',
+  path: '/legal/privacidad',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalEliminarDatosRoute = LegalEliminarDatosRouteImport.update({
+  id: '/legal/eliminar-datos',
+  path: '/legal/eliminar-datos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalCookiesRoute = LegalCookiesRouteImport.update({
+  id: '/legal/cookies',
+  path: '/legal/cookies',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ESlugRoute = ESlugRouteImport.update({
   id: '/e/$slug',
   path: '/e/$slug',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => AuthRoute,
 } as any)
 const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
   id: '/app',
@@ -64,11 +101,6 @@ const AuthenticatedAppIndexRoute = AuthenticatedAppIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedAppRoute,
-} as any)
-const ESlugSummaryRoute = ESlugSummaryRouteImport.update({
-  id: '/summary',
-  path: '/summary',
-  getParentRoute: () => ESlugRoute,
 } as any)
 const ESlugRsvpRoute = ESlugRsvpRouteImport.update({
   id: '/rsvp',
@@ -107,57 +139,90 @@ const AuthenticatedAppEventsIdRoute =
     path: '/events/$id',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
+const AuthenticatedAppEventsIdTablesRoute =
+  AuthenticatedAppEventsIdTablesRouteImport.update({
+    id: '/tables',
+    path: '/tables',
+    getParentRoute: () => AuthenticatedAppEventsIdRoute,
+  } as any)
+const AuthenticatedAppEventsIdMessagesRoute =
+  AuthenticatedAppEventsIdMessagesRouteImport.update({
+    id: '/messages',
+    path: '/messages',
+    getParentRoute: () => AuthenticatedAppEventsIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/app': typeof AuthenticatedAppRouteWithChildren
+  '/auth/forgot-password': typeof AuthForgotPasswordRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
   '/e/$slug': typeof ESlugRouteWithChildren
+  '/legal/cookies': typeof LegalCookiesRoute
+  '/legal/eliminar-datos': typeof LegalEliminarDatosRoute
+  '/legal/privacidad': typeof LegalPrivacidadRoute
+  '/legal/terminos': typeof LegalTerminosRoute
   '/r/$slug': typeof RSlugRoute
   '/e/$slug/gallery': typeof ESlugGalleryRoute
   '/e/$slug/live': typeof ESlugLiveRoute
   '/e/$slug/memories': typeof ESlugMemoriesRoute
   '/e/$slug/messages': typeof ESlugMessagesRoute
   '/e/$slug/rsvp': typeof ESlugRsvpRoute
-  '/e/$slug/summary': typeof ESlugSummaryRoute
   '/app/': typeof AuthenticatedAppIndexRoute
   '/e/$slug/': typeof ESlugIndexRoute
-  '/app/events/$id': typeof AuthenticatedAppEventsIdRoute
+  '/app/events/$id': typeof AuthenticatedAppEventsIdRouteWithChildren
   '/app/events/new': typeof AuthenticatedAppEventsNewRoute
+  '/app/events/$id/messages': typeof AuthenticatedAppEventsIdMessagesRoute
+  '/app/events/$id/tables': typeof AuthenticatedAppEventsIdTablesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
+  '/auth/forgot-password': typeof AuthForgotPasswordRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/legal/cookies': typeof LegalCookiesRoute
+  '/legal/eliminar-datos': typeof LegalEliminarDatosRoute
+  '/legal/privacidad': typeof LegalPrivacidadRoute
+  '/legal/terminos': typeof LegalTerminosRoute
   '/r/$slug': typeof RSlugRoute
   '/e/$slug/gallery': typeof ESlugGalleryRoute
   '/e/$slug/live': typeof ESlugLiveRoute
   '/e/$slug/memories': typeof ESlugMemoriesRoute
   '/e/$slug/messages': typeof ESlugMessagesRoute
   '/e/$slug/rsvp': typeof ESlugRsvpRoute
-  '/e/$slug/summary': typeof ESlugSummaryRoute
   '/app': typeof AuthenticatedAppIndexRoute
   '/e/$slug': typeof ESlugIndexRoute
-  '/app/events/$id': typeof AuthenticatedAppEventsIdRoute
+  '/app/events/$id': typeof AuthenticatedAppEventsIdRouteWithChildren
   '/app/events/new': typeof AuthenticatedAppEventsNewRoute
+  '/app/events/$id/messages': typeof AuthenticatedAppEventsIdMessagesRoute
+  '/app/events/$id/tables': typeof AuthenticatedAppEventsIdTablesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/_authenticated/app': typeof AuthenticatedAppRouteWithChildren
+  '/auth/forgot-password': typeof AuthForgotPasswordRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
   '/e/$slug': typeof ESlugRouteWithChildren
+  '/legal/cookies': typeof LegalCookiesRoute
+  '/legal/eliminar-datos': typeof LegalEliminarDatosRoute
+  '/legal/privacidad': typeof LegalPrivacidadRoute
+  '/legal/terminos': typeof LegalTerminosRoute
   '/r/$slug': typeof RSlugRoute
   '/e/$slug/gallery': typeof ESlugGalleryRoute
   '/e/$slug/live': typeof ESlugLiveRoute
   '/e/$slug/memories': typeof ESlugMemoriesRoute
   '/e/$slug/messages': typeof ESlugMessagesRoute
   '/e/$slug/rsvp': typeof ESlugRsvpRoute
-  '/e/$slug/summary': typeof ESlugSummaryRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
   '/e/$slug/': typeof ESlugIndexRoute
-  '/_authenticated/app/events/$id': typeof AuthenticatedAppEventsIdRoute
+  '/_authenticated/app/events/$id': typeof AuthenticatedAppEventsIdRouteWithChildren
   '/_authenticated/app/events/new': typeof AuthenticatedAppEventsNewRoute
+  '/_authenticated/app/events/$id/messages': typeof AuthenticatedAppEventsIdMessagesRoute
+  '/_authenticated/app/events/$id/tables': typeof AuthenticatedAppEventsIdTablesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -165,58 +230,83 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/app'
+    | '/auth/forgot-password'
+    | '/auth/reset-password'
     | '/e/$slug'
+    | '/legal/cookies'
+    | '/legal/eliminar-datos'
+    | '/legal/privacidad'
+    | '/legal/terminos'
     | '/r/$slug'
     | '/e/$slug/gallery'
     | '/e/$slug/live'
     | '/e/$slug/memories'
     | '/e/$slug/messages'
     | '/e/$slug/rsvp'
-    | '/e/$slug/summary'
     | '/app/'
     | '/e/$slug/'
     | '/app/events/$id'
     | '/app/events/new'
+    | '/app/events/$id/messages'
+    | '/app/events/$id/tables'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
+    | '/auth/forgot-password'
+    | '/auth/reset-password'
+    | '/legal/cookies'
+    | '/legal/eliminar-datos'
+    | '/legal/privacidad'
+    | '/legal/terminos'
     | '/r/$slug'
     | '/e/$slug/gallery'
     | '/e/$slug/live'
     | '/e/$slug/memories'
     | '/e/$slug/messages'
     | '/e/$slug/rsvp'
-    | '/e/$slug/summary'
     | '/app'
     | '/e/$slug'
     | '/app/events/$id'
     | '/app/events/new'
+    | '/app/events/$id/messages'
+    | '/app/events/$id/tables'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/app'
+    | '/auth/forgot-password'
+    | '/auth/reset-password'
     | '/e/$slug'
+    | '/legal/cookies'
+    | '/legal/eliminar-datos'
+    | '/legal/privacidad'
+    | '/legal/terminos'
     | '/r/$slug'
     | '/e/$slug/gallery'
     | '/e/$slug/live'
     | '/e/$slug/memories'
     | '/e/$slug/messages'
     | '/e/$slug/rsvp'
-    | '/e/$slug/summary'
     | '/_authenticated/app/'
     | '/e/$slug/'
     | '/_authenticated/app/events/$id'
     | '/_authenticated/app/events/new'
+    | '/_authenticated/app/events/$id/messages'
+    | '/_authenticated/app/events/$id/tables'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
-  AuthRoute: typeof AuthRoute
+  AuthRoute: typeof AuthRouteWithChildren
   ESlugRoute: typeof ESlugRouteWithChildren
+  LegalCookiesRoute: typeof LegalCookiesRoute
+  LegalEliminarDatosRoute: typeof LegalEliminarDatosRoute
+  LegalPrivacidadRoute: typeof LegalPrivacidadRoute
+  LegalTerminosRoute: typeof LegalTerminosRoute
   RSlugRoute: typeof RSlugRoute
 }
 
@@ -250,12 +340,54 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/legal/terminos': {
+      id: '/legal/terminos'
+      path: '/legal/terminos'
+      fullPath: '/legal/terminos'
+      preLoaderRoute: typeof LegalTerminosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/privacidad': {
+      id: '/legal/privacidad'
+      path: '/legal/privacidad'
+      fullPath: '/legal/privacidad'
+      preLoaderRoute: typeof LegalPrivacidadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/eliminar-datos': {
+      id: '/legal/eliminar-datos'
+      path: '/legal/eliminar-datos'
+      fullPath: '/legal/eliminar-datos'
+      preLoaderRoute: typeof LegalEliminarDatosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/cookies': {
+      id: '/legal/cookies'
+      path: '/legal/cookies'
+      fullPath: '/legal/cookies'
+      preLoaderRoute: typeof LegalCookiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/e/$slug': {
       id: '/e/$slug'
       path: '/e/$slug'
       fullPath: '/e/$slug'
       preLoaderRoute: typeof ESlugRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/auth/reset-password': {
+      id: '/auth/reset-password'
+      path: '/reset-password'
+      fullPath: '/auth/reset-password'
+      preLoaderRoute: typeof AuthResetPasswordRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/auth/forgot-password': {
+      id: '/auth/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/auth/forgot-password'
+      preLoaderRoute: typeof AuthForgotPasswordRouteImport
+      parentRoute: typeof AuthRoute
     }
     '/_authenticated/app': {
       id: '/_authenticated/app'
@@ -277,13 +409,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/'
       preLoaderRoute: typeof AuthenticatedAppIndexRouteImport
       parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/e/$slug/summary': {
-      id: '/e/$slug/summary'
-      path: '/summary'
-      fullPath: '/e/$slug/summary'
-      preLoaderRoute: typeof ESlugSummaryRouteImport
-      parentRoute: typeof ESlugRoute
     }
     '/e/$slug/rsvp': {
       id: '/e/$slug/rsvp'
@@ -334,18 +459,49 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppEventsIdRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/app/events/$id/tables': {
+      id: '/_authenticated/app/events/$id/tables'
+      path: '/tables'
+      fullPath: '/app/events/$id/tables'
+      preLoaderRoute: typeof AuthenticatedAppEventsIdTablesRouteImport
+      parentRoute: typeof AuthenticatedAppEventsIdRoute
+    }
+    '/_authenticated/app/events/$id/messages': {
+      id: '/_authenticated/app/events/$id/messages'
+      path: '/messages'
+      fullPath: '/app/events/$id/messages'
+      preLoaderRoute: typeof AuthenticatedAppEventsIdMessagesRouteImport
+      parentRoute: typeof AuthenticatedAppEventsIdRoute
+    }
   }
 }
 
+interface AuthenticatedAppEventsIdRouteChildren {
+  AuthenticatedAppEventsIdMessagesRoute: typeof AuthenticatedAppEventsIdMessagesRoute
+  AuthenticatedAppEventsIdTablesRoute: typeof AuthenticatedAppEventsIdTablesRoute
+}
+
+const AuthenticatedAppEventsIdRouteChildren: AuthenticatedAppEventsIdRouteChildren =
+  {
+    AuthenticatedAppEventsIdMessagesRoute:
+      AuthenticatedAppEventsIdMessagesRoute,
+    AuthenticatedAppEventsIdTablesRoute: AuthenticatedAppEventsIdTablesRoute,
+  }
+
+const AuthenticatedAppEventsIdRouteWithChildren =
+  AuthenticatedAppEventsIdRoute._addFileChildren(
+    AuthenticatedAppEventsIdRouteChildren,
+  )
+
 interface AuthenticatedAppRouteChildren {
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
-  AuthenticatedAppEventsIdRoute: typeof AuthenticatedAppEventsIdRoute
+  AuthenticatedAppEventsIdRoute: typeof AuthenticatedAppEventsIdRouteWithChildren
   AuthenticatedAppEventsNewRoute: typeof AuthenticatedAppEventsNewRoute
 }
 
 const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
-  AuthenticatedAppEventsIdRoute: AuthenticatedAppEventsIdRoute,
+  AuthenticatedAppEventsIdRoute: AuthenticatedAppEventsIdRouteWithChildren,
   AuthenticatedAppEventsNewRoute: AuthenticatedAppEventsNewRoute,
 }
 
@@ -363,13 +519,24 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface AuthRouteChildren {
+  AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
+  AuthResetPasswordRoute: typeof AuthResetPasswordRoute
+}
+
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthForgotPasswordRoute: AuthForgotPasswordRoute,
+  AuthResetPasswordRoute: AuthResetPasswordRoute,
+}
+
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
+
 interface ESlugRouteChildren {
   ESlugGalleryRoute: typeof ESlugGalleryRoute
   ESlugLiveRoute: typeof ESlugLiveRoute
   ESlugMemoriesRoute: typeof ESlugMemoriesRoute
   ESlugMessagesRoute: typeof ESlugMessagesRoute
   ESlugRsvpRoute: typeof ESlugRsvpRoute
-  ESlugSummaryRoute: typeof ESlugSummaryRoute
   ESlugIndexRoute: typeof ESlugIndexRoute
 }
 
@@ -379,7 +546,6 @@ const ESlugRouteChildren: ESlugRouteChildren = {
   ESlugMemoriesRoute: ESlugMemoriesRoute,
   ESlugMessagesRoute: ESlugMessagesRoute,
   ESlugRsvpRoute: ESlugRsvpRoute,
-  ESlugSummaryRoute: ESlugSummaryRoute,
   ESlugIndexRoute: ESlugIndexRoute,
 }
 
@@ -388,8 +554,12 @@ const ESlugRouteWithChildren = ESlugRoute._addFileChildren(ESlugRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
-  AuthRoute: AuthRoute,
+  AuthRoute: AuthRouteWithChildren,
   ESlugRoute: ESlugRouteWithChildren,
+  LegalCookiesRoute: LegalCookiesRoute,
+  LegalEliminarDatosRoute: LegalEliminarDatosRoute,
+  LegalPrivacidadRoute: LegalPrivacidadRoute,
+  LegalTerminosRoute: LegalTerminosRoute,
   RSlugRoute: RSlugRoute,
 }
 export const routeTree = rootRouteImport

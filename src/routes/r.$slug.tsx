@@ -1,13 +1,15 @@
 import { createFileRoute, notFound, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { getGuest, saveGuest, generateDeviceToken } from "@/lib/guest-identity";
+import { getGuest } from "@/lib/guest-identity";
+import { ensureGuestSession } from "@/lib/guest-session";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { CheckCircle2, XCircle, Calendar, MapPin, ArrowRight } from "lucide-react";
+import { CheckCircle2, XCircle, Calendar, MapPin, ArrowRight, Plus, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { LiveMomentsLogo } from "@/components/Logo";
@@ -47,20 +49,49 @@ function RsvpStandalone() {
   const [note, setNote] = useState("");
   const [saving, setSaving] = useState(false);
   const [existingId, setExistingId] = useState<string | null>(null);
+  const [guestId, setGuestId] = useState<string | null>(null);
   const [done, setDone] = useState(false);
 
   const finished = event.status === "finished" || event.status === "archived";
   const draft = event.status === "draft";
 
+  // allow_rsvp existe en event_settings (default true) — no se leía en
+  // ningún lugar del frontend hasta esta corrección. Mismo patrón ya usado
+  // en e.$slug.gallery.tsx / e.$slug.messages.tsx / e.$slug.memories.tsx.
+  const { data: settings } = useQuery({
+    queryKey: ["event-settings-public", event.id, "allow_rsvp"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("event_settings")
+        .select("allow_rsvp")
+        .eq("event_id", event.id)
+        .maybeSingle();
+      return data;
+    },
+  });
+  const rsvpEnabled = settings?.allow_rsvp ?? true;
+
   useEffect(() => {
     if (draft) return;
-    const g = getGuest(event.id);
-    if (g) {
-      setFullName(`${g.firstName}${g.lastName ? " " + g.lastName : ""}`);
+    let cancelled = false;
+    const local = getGuest(event.id);
+    if (local) setFullName(`${local.firstName}${local.lastName ? " " + local.lastName : ""}`);
+    ensureGuestSession(event.id, local?.firstName ?? "").then((id) => {
+      if (cancelled) return;
+      setGuestId(id);
+      if (!id) {
+        toast.error("No pudimos identificarte. Recargá la página para intentar de nuevo.");
+        return;
+      }
       supabase.from("rsvps")
         .select("id, status, adults, children, dietary, dietary_items, note, full_name")
-        .eq("event_id", event.id).eq("guest_id", g.guestId).maybeSingle()
-        .then(({ data }) => {
+        .eq("event_id", event.id).eq("guest_id", id).maybeSingle()
+        .then(({ data, error }) => {
+          if (cancelled) return;
+          if (error) {
+            toast.error("No pudimos cargar tu respuesta anterior. Recargá la página antes de confirmar de nuevo.");
+            return;
+          }
           if (data) {
             setExistingId(data.id);
             setStatus(data.status === "declined" ? "declined" : "confirmed");
@@ -75,8 +106,12 @@ function RsvpStandalone() {
             setNote(data.note ?? "");
             setFullName(data.full_name);
           }
+        })
+        .catch(() => {
+          if (!cancelled) toast.error("No pudimos cargar tu respuesta anterior. Recargá la página antes de confirmar de nuevo.");
         });
-    }
+    });
+    return () => { cancelled = true; };
   }, [event.id, draft]);
 
   function addRestriction() {
@@ -102,23 +137,11 @@ function RsvpStandalone() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (!rsvpEnabled) return toast.error("Las confirmaciones están cerradas para este evento.");
     if (!fullName.trim()) return toast.error("Ingresá tu nombre");
+    if (!guestId) return toast.error("Todavía estamos identificándote, esperá un momento y volvé a intentar.");
     setSaving(true);
     try {
-      // asegurar guest para poder actualizar en próximas visitas
-      let guest = getGuest(event.id);
-      if (!guest) {
-        const [firstName, ...rest] = fullName.trim().split(" ");
-        const lastName = rest.join(" ") || null;
-        const token = generateDeviceToken();
-        const { data: g, error: gErr } = await supabase.from("guests").insert({
-          event_id: event.id, device_token: token, first_name: firstName, last_name: lastName,
-        }).select("id").single();
-        if (gErr) throw gErr;
-        saveGuest(event.id, { guestId: g.id, deviceToken: token, firstName, lastName: lastName ?? undefined });
-        guest = { guestId: g.id, deviceToken: token, firstName, lastName: lastName ?? undefined };
-      }
-
       if (existingId) {
         const { error } = await supabase.from("rsvps").update({
           full_name: fullName, status, adults: Number(adults) || 1, children: Number(children) || 0,
@@ -127,7 +150,7 @@ function RsvpStandalone() {
         if (error) throw error;
       } else {
         const { data, error } = await supabase.from("rsvps").insert({
-          event_id: event.id, guest_id: guest.guestId,
+          event_id: event.id, guest_id: guestId,
           full_name: fullName, status, adults: Number(adults) || 1, children: Number (children) || 0,
           dietary: dietary || null, dietary_items: dietaryItems, note: note || null,
         }).select("id").single();
@@ -183,7 +206,12 @@ function RsvpStandalone() {
             </Link>
           </div>
         )}
-        {!draft && !finished && done ? (
+        {!draft && !finished && !rsvpEnabled && (
+          <div className="rounded-2xl border bg-cream/40 p-6 text-center">
+            <p>Las confirmaciones están cerradas para este evento.</p>
+          </div>
+        )}
+        {!draft && !finished && rsvpEnabled && done ? (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
             className="rounded-3xl border bg-card p-8 text-center shadow-soft">
             <div className="mx-auto inline-flex h-14 w-14 items-center justify-center rounded-full bg-gradient-gold text-primary-foreground">
@@ -199,7 +227,7 @@ function RsvpStandalone() {
               <Button variant="outline" onClick={() => setDone(false)} className="rounded-full">Editar respuesta</Button>
             </div>
           </motion.div>
-        ) : !draft && !finished && (
+        ) : !draft && !finished && rsvpEnabled && (
           <form onSubmit={submit} className="space-y-6 rounded-3xl border bg-card p-8 shadow-soft">
             <div className="grid gap-3 md:grid-cols-2">
               <button type="button" onClick={() => setStatus("confirmed")}
@@ -232,63 +260,54 @@ function RsvpStandalone() {
                   </div>
                 </div>
                 <div>
-                  <Label>Restricciones alimentarias</Label>
+                  <Label htmlFor="di">Restricciones alimentarias (nota general)</Label>
+                  <Input id="di" value={dietary} onChange={(e) => setDietary(e.target.value)} placeholder="Vegetariano, celíaco…" />
+                </div>
+                <div>
+                  <Label>Detalle por persona (opcional)</Label>
+                  <p className="text-xs text-muted-foreground">Ayuda al organizador a calcular el catering con precisión.</p>
 
-                  <div className="space-y-3 mt-2">
-
+                  <div className="mt-2 space-y-2">
                     {dietaryItems.map((item, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center gap-2 rounded-xl border p-3"
-                      >
-                        <span className="flex-1">
-                          {item.name}
-                        </span>
-              
-                        <span>
-                          x{item.quantity}
-                        </span>
-              
-                        <Button
+                      <div key={index} className="flex items-center gap-2 rounded-xl border p-3">
+                        <span className="flex-1 text-sm">{item.name}</span>
+                        <span className="text-sm text-muted-foreground">x{item.quantity}</span>
+                        <button
                           type="button"
-                          variant="outline"
                           onClick={() => removeRestriction(index)}
+                          aria-label={`Quitar restricción: ${item.name}`}
+                          className="rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                         >
-                          X
-                                      </Button>
-                                    </div>
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
                     ))}
-              
+
                     <div className="flex gap-2">
-              
-                      <Input
-                        placeholder="Ej: Celíaco"
-                        value={newRestriction}
-                        onChange={(e) =>
-                          setNewRestriction(e.target.value)
-                        }
-                      />
-              
-                      <Input
-                        type="number"
-                        min={1}
-                        className="w-24"
-                        value={newRestrictionQty}
-                        onChange={(e) =>
-                          setNewRestrictionQty(Number(e.target.value))
-                        }
-                      />
-              
+                      <div className="flex-1">
+                        <Label htmlFor="new-restriction" className="sr-only">Nueva restricción</Label>
+                        <Input
+                          id="new-restriction"
+                          placeholder="Ej: Celíaco"
+                          value={newRestriction}
+                          onChange={(e) => setNewRestriction(e.target.value)}
+                        />
+                      </div>
+                      <div className="w-20">
+                        <Label htmlFor="new-restriction-qty" className="sr-only">Cantidad de personas</Label>
+                        <Input
+                          id="new-restriction-qty"
+                          type="number"
+                          min={1}
+                          value={newRestrictionQty}
+                          onChange={(e) => setNewRestrictionQty(Number(e.target.value))}
+                        />
+                      </div>
                     </div>
-              
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={addRestriction}
-                    >
-                      + Agregar restricción
+
+                    <Button type="button" variant="outline" onClick={addRestriction} className="rounded-full">
+                      <Plus className="mr-1.5 h-4 w-4" /> Agregar restricción
                     </Button>
-              
                   </div>
                 </div>
               </>
@@ -302,6 +321,10 @@ function RsvpStandalone() {
             <Button type="submit" disabled={saving} className="w-full rounded-full bg-gradient-gold text-primary-foreground shadow-elegant transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:translate-y-0">
               {saving ? "Guardando…" : existingId ? "Actualizar" : "Confirmar"}
             </Button>
+            <p className="text-center text-xs text-muted-foreground">
+              Tus datos se usan únicamente para que el organizador organice el evento. Ver{" "}
+              <Link to="/legal/privacidad" className="underline underline-offset-2">Política de Privacidad</Link>.
+            </p>
           </form>
         )}
       </div>

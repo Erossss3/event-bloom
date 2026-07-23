@@ -1,0 +1,34 @@
+{
+  "name": "livemoments-video-summary",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Proyecto Remotion independiente que renderiza los Video Summary de LiveMoments. No depende del bundle de la app principal (TanStack Start) ni es importado por ella — se ejecuta como un proceso Node separado (Remotion Studio en desarrollo, @remotion/renderer en el worker de producción).",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "render:cinematic": "remotion render src/index.ts VideoSummary out/cinematic.mp4 --props='{\"style\":\"cinematic\"}'",
+    "worker": "tsx src/worker/cli.ts",
+    "upgrade": "remotion upgrade",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@remotion/bundler": "^4.0.0",
+    "@remotion/cli": "^4.0.0",
+    "@remotion/google-fonts": "^4.0.0",
+    "@remotion/renderer": "^4.0.0",
+    "@remotion/transitions": "^4.0.0",
+    "@supabase/supabase-js": "^2.110.2",
+    "dotenv": "^17.4.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "remotion": "^4.0.0",
+    "tsx": "^4.16.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.1",
+    "typescript": "^5.5.4"
+  }
+}

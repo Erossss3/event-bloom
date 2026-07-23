@@ -448,6 +448,7 @@ export type Database = {
           id: string
           note: string | null
           status: Database["public"]["Enums"]["rsvp_status"]
+          table_id: string | null
           updated_at: string
         }
         Insert: {
@@ -462,6 +463,7 @@ export type Database = {
           id?: string
           note?: string | null
           status?: Database["public"]["Enums"]["rsvp_status"]
+          table_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -476,6 +478,7 @@ export type Database = {
           id?: string
           note?: string | null
           status?: Database["public"]["Enums"]["rsvp_status"]
+          table_id?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -491,6 +494,63 @@ export type Database = {
             columns: ["guest_id"]
             isOneToOne: false
             referencedRelation: "guests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rsvps_table_id_fkey"
+            columns: ["table_id"]
+            isOneToOne: false
+            referencedRelation: "event_tables"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_tables: {
+        Row: {
+          capacity: number
+          color: string | null
+          created_at: string
+          description: string | null
+          event_id: string
+          id: string
+          name: string
+          number: number | null
+          position_x: number
+          position_y: number
+          updated_at: string
+        }
+        Insert: {
+          capacity?: number
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          event_id: string
+          id?: string
+          name: string
+          number?: number | null
+          position_x?: number
+          position_y?: number
+          updated_at?: string
+        }
+        Update: {
+          capacity?: number
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          event_id?: string
+          id?: string
+          name?: string
+          number?: number | null
+          position_x?: number
+          position_y?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_tables_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
             referencedColumns: ["id"]
           },
         ]

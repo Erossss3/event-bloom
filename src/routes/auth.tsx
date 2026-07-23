@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, useSearch, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useSearch, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LiveMomentsLogo } from "@/components/Logo";
+import { Eye, EyeOff } from "lucide-react";
 
 const searchSchema = z.object({ redirect: z.string().optional() });
 
@@ -20,11 +21,15 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const { redirect } = useSearch({ from: "/auth" });
   const navigate = useNavigate();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isSubPage = pathname.endsWith("/forgot-password") || pathname.endsWith("/reset-password");
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const goNext = () => navigate({ to: redirect ?? "/app" });
 
@@ -54,24 +59,30 @@ function AuthPage() {
   }
 
   async function handleGoogle() {
-  try {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/app`,
-      },
-    });
+    setGoogleLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/app`,
+        },
+      });
 
-    if (error) throw error;
-  } catch (err) {
-    toast.error(err instanceof Error ? err.message : "Error al iniciar con Google");
+      if (error) throw error;
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Error al iniciar con Google");
+      setGoogleLoading(false);
+    }
   }
-}
+
+  if (isSubPage) {
+    return <Outlet />;
+  }
 
   return (
     <div className="grid min-h-screen md:grid-cols-2">
       <div className="hidden bg-gradient-hero p-14 md:flex md:flex-col md:justify-between">
-        <Link to="/"><LiveMomentsLogo className="h-14" /></Link>
+        <Link to="/" className="w-fit rounded-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2"><LiveMomentsLogo className="h-14" /></Link>
         <div>
           <p className="text-xs uppercase tracking-[0.3em] text-gold">Para organizadoras</p>
           <h2 className="mt-4 max-w-md font-display text-4xl leading-tight">
@@ -93,8 +104,8 @@ function AuthPage() {
             <p className="text-sm text-muted-foreground">Accedé a tu panel de organizadora.</p>
           </div>
 
-          <Button type="button" variant="outline" className="w-full rounded-full" onClick={handleGoogle}>
-            <GoogleIcon /> Continuar con Google
+          <Button type="button" variant="outline" disabled={googleLoading} className="w-full rounded-full" onClick={handleGoogle}>
+            <GoogleIcon /> {googleLoading ? "Redirigiendo…" : "Continuar con Google"}
           </Button>
 
           <div className="flex items-center gap-3 text-xs uppercase tracking-widest text-muted-foreground">
@@ -105,25 +116,66 @@ function AuthPage() {
             {mode === "signup" && (
               <div>
                 <Label htmlFor="name">Nombre</Label>
-                <Input id="name" value={name} onChange={(e) => setName(e.target.value)} required />
+                <Input id="name" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} required />
               </div>
             )}
             <div>
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+              <Input id="email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
             </div>
             <div>
-              <Label htmlFor="password">Contraseña</Label>
-              <Input id="password" type="password" minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} required />
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Contraseña</Label>
+                {mode === "signin" && (
+                  <Link
+                    to="/auth/forgot-password"
+                    className="rounded-sm text-xs text-muted-foreground underline-offset-2 transition-colors hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  >
+                    ¿Olvidaste tu contraseña?
+                  </Link>
+                )}
+              </div>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete={mode === "signup" ? "new-password" : "current-password"}
+                  minLength={6}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                  className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded-r-md"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
             <Button type="submit" disabled={loading} className="w-full rounded-full bg-gradient-gold text-primary-foreground shadow-elegant transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:translate-y-0 disabled:opacity-70">
               {loading ? "Un momento…" : mode === "signin" ? "Ingresar" : "Crear cuenta"}
             </Button>
           </form>
 
+          <p className="text-center text-xs text-muted-foreground">
+            Al continuar, aceptás los{" "}
+            <Link to="/legal/terminos" className="underline underline-offset-2">Términos y Condiciones</Link>{" "}
+            y la{" "}
+            <Link to="/legal/privacidad" className="underline underline-offset-2">Política de Privacidad</Link>{" "}
+            de LiveMoments.
+          </p>
+
           <p className="text-center text-sm text-muted-foreground">
             {mode === "signin" ? "¿No tenés cuenta?" : "¿Ya tenés cuenta?"}{" "}
-            <button className="font-medium text-foreground underline" onClick={() => setMode(mode === "signin" ? "signup" : "signin")}>
+            <button
+              type="button"
+              className="rounded-sm font-medium text-foreground underline focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
+            >
               {mode === "signin" ? "Registrate" : "Ingresá"}
             </button>
           </p>

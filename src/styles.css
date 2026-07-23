@@ -123,7 +123,7 @@
 
 @layer base {
   * { border-color: var(--color-border); }
-  html { -webkit-font-smoothing: antialiased; }
+  html { -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
   body {
     background: var(--color-background);
     color: var(--color-foreground);
@@ -149,15 +149,73 @@
 @utility animate-fade-up { animation: momento-fade-up 0.6s ease-out both; }
 
 @keyframes kenburns {
-  0% {
-    transform: scale(1);
-  }
-
-  100% {
-    transform: scale(1.08);
-  }
+  0% { transform: scale(1) translate3d(0, 0, 0); }
+  100% { transform: scale(1.025) translate3d(-0.3%, -0.2%, 0); }
 }
-
 .animate-kenburns {
-  animation: kenburns 6s ease-in-out infinite alternate;
+  animation: kenburns 20s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
 }
+
+/* Pantalla Live: una única familia de animación para toda la experiencia
+   (basada en Elegante) — zoom muy lento, desplazamiento mínimo, easing suave,
+   sin rebotes. Se usa igual en todos los estilos de una sola foto para que
+   la pantalla se sienta como una misma identidad, no como estilos distintos. */
+.animate-live-ambient { animation: kenburns 20s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate; }
+
+/* Pantalla de carga: fade in + leve escala + respiración sutil (sin efectos exagerados). */
+@keyframes live-loading-logo {
+  0% { opacity: 0; transform: scale(0.92); }
+  18% { opacity: 1; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.015); }
+  100% { opacity: 0.88; transform: scale(0.99); }
+}
+.animate-live-loading-logo {
+  animation: live-loading-logo 3.6s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+}
+
+@keyframes live-fade-in-soft {
+  0% { opacity: 0; transform: scale(0.995); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Mosaicos: casi la misma deriva mínima en las 4 celdas — apenas una variación
+   de dirección para que no se vean clonadas entre sí, pero sin que ninguna
+   destaque más que las otras (misma amplitud, misma duración base). */
+@keyframes live-mosaic-drift-tl {
+  0% { transform: scale(1.012) translate3d(-0.18%, -0.14%, 0); }
+  100% { transform: scale(1.025) translate3d(0.1%, 0.1%, 0); }
+}
+@keyframes live-mosaic-drift-tr {
+  0% { transform: scale(1.014) translate3d(0.18%, -0.12%, 0); }
+  100% { transform: scale(1.025) translate3d(-0.1%, 0.12%, 0); }
+}
+@keyframes live-mosaic-drift-bl {
+  0% { transform: scale(1.014) translate3d(-0.14%, 0.16%, 0); }
+  100% { transform: scale(1.025) translate3d(0.12%, -0.1%, 0); }
+}
+@keyframes live-mosaic-drift-br {
+  0% { transform: scale(1.012) translate3d(0.16%, 0.14%, 0); }
+  100% { transform: scale(1.025) translate3d(-0.12%, -0.12%, 0); }
+}
+.animate-live-mosaic-tl { animation: live-fade-in-soft 1.6s cubic-bezier(0.45, 0, 0.55, 1) both, live-mosaic-drift-tl 20s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate 1.6s; }
+.animate-live-mosaic-tr { animation: live-fade-in-soft 1.6s cubic-bezier(0.45, 0, 0.55, 1) both, live-mosaic-drift-tr 20.6s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate 1.6s; }
+.animate-live-mosaic-bl { animation: live-fade-in-soft 1.6s cubic-bezier(0.45, 0, 0.55, 1) both, live-mosaic-drift-bl 21.2s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate 1.6s; }
+.animate-live-mosaic-br { animation: live-fade-in-soft 1.6s cubic-bezier(0.45, 0, 0.55, 1) both, live-mosaic-drift-br 19.6s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate 1.6s; }
+/* Solo la deriva continua, sin el fade de entrada — para la capa "foto anterior"
+   dentro del crossfade, que no debe reaparecer desde opacidad 0 en cada remount. */
+.animate-live-mosaic-tl-drift { animation: live-mosaic-drift-tl 20s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate; }
+.animate-live-mosaic-tr-drift { animation: live-mosaic-drift-tr 20.6s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate; }
+.animate-live-mosaic-bl-drift { animation: live-mosaic-drift-bl 21.2s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate; }
+.animate-live-mosaic-br-drift { animation: live-mosaic-drift-br 19.6s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate; }
+
+/* Mosaico 2: díptico editorial — misma deriva mínima en ambos paneles. */
+@keyframes live-diptych-left {
+  0% { transform: scale(1.012) translate3d(-0.1%, 0, 0); }
+  100% { transform: scale(1.025) translate3d(0.1%, 0, 0); }
+}
+@keyframes live-diptych-right {
+  0% { transform: scale(1.025) translate3d(0.1%, 0, 0); }
+  100% { transform: scale(1.012) translate3d(-0.1%, 0, 0); }
+}
+.animate-live-diptych-left { animation: live-diptych-left 20s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate; }
+.animate-live-diptych-right { animation: live-diptych-right 20s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate; }

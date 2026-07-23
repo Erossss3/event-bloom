@@ -4,9 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { getGuest } from "@/lib/guest-identity";
 import { GuestJoinDialog } from "@/components/GuestJoinDialog";
-import { Calendar, Camera, Heart, Home, MapPin, MessageCircle, Sparkles } from "lucide-react";
+import { Calendar, Camera, Home, MessageCircle, Sparkles } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { motion } from "framer-motion";
 import { LiveLockDialog } from "@/components/LiveLockDialog";
 import { LiveMomentsLogo } from "@/components/Logo";
 
@@ -15,6 +16,11 @@ export const Route = createFileRoute("/e/$slug")({
     const { data, error } = await supabase.from("events")
       .select("id, slug, title, description, cover_url, event_type, location_name, location_address, latitude, longitude, starts_at, ends_at, status, theme_color")
       .eq("slug", params.slug).maybeSingle();
+    if (error) {
+      // No ocultar el motivo real: "0 filas" y "error de permisos" no son lo
+      // mismo, y antes se mostraba el mismo 404 genérico para ambos casos.
+      console.error("[e/$slug] error al buscar el evento:", error);
+    }
     if (error || !data) throw notFound();
     return { event: data };
   },
@@ -75,7 +81,7 @@ function EventLayout() {
   
   return (
     <div className="relative min-h-screen bg-background pb-24">
-      <div className="relative h-72 overflow-hidden md:h-96">
+      <div className="relative h-80 overflow-hidden md:h-[28rem]">
         {event.cover_url
           ? <img src={event.cover_url} alt="" className="h-full w-full object-cover" />
           : <div className="h-full w-full bg-gradient-hero" />}
@@ -85,14 +91,21 @@ function EventLayout() {
             <LiveMomentsLogo variant={event.cover_url ? "light" : "dark"} className="h-12 drop-shadow-xl"/>
           </Link>
         </div>
-        <div className="absolute inset-x-0 bottom-0 mx-auto max-w-4xl px-6 pb-10">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="absolute inset-x-0 bottom-0 mx-auto max-w-4xl px-6 pb-14"
+        >
           <p className="text-xs uppercase tracking-[0.4em] text-gold">{event.event_type ?? "Evento"}</p>
-          <h1 className="mt-3 font-display text-5xl leading-tight md:text-6xl">{event.title}</h1>
-          <div className="mt-3 flex flex-wrap gap-4 text-sm text-muted-foreground">
-            <span className="inline-flex items-center gap-1"><Calendar className="h-4 w-4" />{format(new Date(event.starts_at), "d 'de' MMMM · HH:mm", { locale: es })}</span>
-            {event.location_name && <span className="inline-flex items-center gap-1"><MapPin className="h-4 w-4" />{event.location_name}</span>}
-          </div>
-        </div>
+          <h1 className="mt-4 font-display text-5xl leading-tight md:text-7xl">{event.title}</h1>
+          <span className="mt-5 inline-flex items-center gap-1.5 text-sm text-muted-foreground">
+            <Calendar className="h-4 w-4" />{format(new Date(event.starts_at), "d 'de' MMMM · HH:mm", { locale: es })}
+          </span>
+          {event.description && (
+            <p className="mt-4 max-w-xl text-base leading-relaxed text-foreground/80">{event.description}</p>
+          )}
+        </motion.div>
       </div>
 
       <div className="sticky top-0 z-30 border-b bg-background/85 backdrop-blur">
@@ -101,7 +114,8 @@ function EventLayout() {
             const active = t.exact ? pathname === `/e/${slug}` : pathname.startsWith(t.to.replace("$slug", slug));
             return (
               <Link key={t.to} to={t.to} params={{ slug }}
-                className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-2 text-sm ${active ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"}`}>
+                aria-current={active ? "page" : undefined}
+                className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring ${active ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"}`}>
                 <t.icon className="h-3.5 w-3.5" /> {t.label}
               </Link>
             );

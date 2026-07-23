@@ -1,5 +1,5 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, useNavigate, useRouteContext } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -25,8 +25,11 @@ const EVENT_TYPES = [
   { v: "other", l: "Otro" },
 ];
 
+const MAX_COVER_SIZE_MB = 8;
+
 function NewEventPage() {
   const navigate = useNavigate();
+  const { user } = useRouteContext({ from: "/_authenticated" });
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
     title: "",
@@ -38,23 +41,49 @@ function NewEventPage() {
     ends_at: "",
   });
   const [cover, setCover] = useState<File | null>(null);
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (coverPreview) URL.revokeObjectURL(coverPreview);
+    };
+  }, [coverPreview]);
+
+  function handleCoverChange(file: File | null) {
+    if (coverPreview) URL.revokeObjectURL(coverPreview);
+    if (!file) {
+      setCover(null);
+      setCoverPreview(null);
+      return;
+    }
+    if (file.size > MAX_COVER_SIZE_MB * 1024 * 1024) {
+      toast.error(`La portada pesa demasiado (máximo ${MAX_COVER_SIZE_MB} MB).`);
+      setCover(null);
+      setCoverPreview(null);
+      return;
+    }
+    setCover(file);
+    setCoverPreview(URL.createObjectURL(file));
+  }
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (form.ends_at && form.starts_at && new Date(form.ends_at) <= new Date(form.starts_at)) {
+      toast.error("La fecha de fin debe ser posterior a la de inicio.");
+      return;
+    }
     setSaving(true);
     try {
-      const { data: user } = await supabase.auth.getUser();
-      if (!user.user) throw new Error("No autenticada");
       const slug = `${slugify(form.title)}-${randomSuffix()}`;
       let cover_url: string | null = null;
       if (cover) {
         const ext = cover.name.split(".").pop();
-        const path = `${user.user.id}/${slug}.${ext}`;
+        const path = `${user.id}/${slug}.${ext}`;
         const { url } = await uploadToBucket("covers", path, cover);
         cover_url = url;
       }
       const { data, error } = await supabase.from("events").insert({
-        owner_id: user.user.id,
+        owner_id: user.id,
         slug,
         title: form.title,
         description: form.description || null,
@@ -85,20 +114,24 @@ function NewEventPage() {
       <form onSubmit={onSubmit} className="mt-10 space-y-6 rounded-3xl border bg-card p-8 shadow-soft">
         <div>
           <Label htmlFor="title">Nombre del evento</Label>
-          <Input id="title" required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Sofía & Martín — Casamiento" />
+          <Input id="title" autoFocus required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Sofía & Martín — Casamiento" />
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
           <div>
-            <Label>Tipo de evento</Label>
+            <Label htmlFor="event_type">Tipo de evento</Label>
             <Select value={form.event_type} onValueChange={(v) => setForm({ ...form, event_type: v })}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger id="event_type"><SelectValue /></SelectTrigger>
               <SelectContent>{EVENT_TYPES.map(t => <SelectItem key={t.v} value={t.v}>{t.l}</SelectItem>)}</SelectContent>
             </Select>
           </div>
           <div>
             <Label htmlFor="cover">Foto de portada</Label>
-            <Input id="cover" type="file" accept="image/*" onChange={(e) => setCover(e.target.files?.[0] ?? null)} />
+            <Input id="cover" type="file" accept="image/*" onChange={(e) => handleCoverChange(e.target.files?.[0] ?? null)} />
+            <p className="mt-1 text-xs text-muted-foreground">Opcional. JPG o PNG, hasta {MAX_COVER_SIZE_MB} MB.</p>
+            {coverPreview && (
+              <img src={coverPreview} alt="Vista previa de la portada" className="mt-2 h-20 w-full rounded-lg object-cover" />
+            )}
           </div>
         </div>
 
@@ -114,7 +147,13 @@ function NewEventPage() {
           </div>
           <div>
             <Label htmlFor="ends">Fin (opcional)</Label>
-            <Input id="ends" type="datetime-local" value={form.ends_at} onChange={(e) => setForm({ ...form, ends_at: e.target.value })} />
+            <Input
+              id="ends"
+              type="datetime-local"
+              min={form.starts_at || undefined}
+              value={form.ends_at}
+              onChange={(e) => setForm({ ...form, ends_at: e.target.value })}
+            />
           </div>
         </div>
 
@@ -129,9 +168,14 @@ function NewEventPage() {
           </div>
         </div>
 
-        <Button type="submit" disabled={saving} className="w-full rounded-full bg-gradient-gold text-primary-foreground shadow-elegant transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:translate-y-0">
-          {saving ? "Creando…" : "Crear y publicar"}
-        </Button>
+        <div>
+          <Button type="submit" disabled={saving} className="w-full rounded-full bg-gradient-gold text-primary-foreground shadow-elegant transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:translate-y-0">
+            {saving ? "Creando…" : "Crear y publicar"}
+          </Button>
+          <p className="mt-2 text-center text-xs text-muted-foreground">
+            Tu evento queda visible para tus invitados apenas lo creás. Vas a poder editar todo después.
+          </p>
+        </div>
       </form>
     </div>
   );

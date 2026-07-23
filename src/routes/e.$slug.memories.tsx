@@ -1,5 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { getGuest } from "@/lib/guest-identity";
 import { uploadToBucket } from "@/lib/storage";
@@ -21,12 +22,49 @@ export const Route = createFileRoute("/e/$slug/memories")({
   component: MemoriesPage,
 });
 
+const MAX_PHOTO_SIZE_MB = 20;
+const MAX_VIDEO_SIZE_MB = 300;
+const MAX_AUDIO_SIZE_MB = 50;
+
 function MemoriesPage() {
   const { event } = layoutApi.useLoaderData();
   const [items, setItems] = useState<Memory[]>([]);
+  const [loaded, setLoaded] = useState(false);
   const [text, setText] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
+
+  // allow_memories existe en event_settings (default true) — no se leía en
+  // ningún lugar del frontend hasta esta corrección.
+  const { data: settings } = useQuery({
+    queryKey: ["event-settings-public", event.id, "allow_memories"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("event_settings")
+        .select("allow_memories")
+        .eq("event_id", event.id)
+        .maybeSingle();
+      return data;
+    },
+  });
+  const memoriesEnabled = (settings?.allow_memories ?? true) && event.status !== "finished";
+
+  function handleFile(f: File | null) {
+    if (!f) { setFile(null); return; }
+    const isVideo = f.type.startsWith("video/");
+    const isAudio = f.type.startsWith("audio/");
+    const isPhoto = f.type.startsWith("image/");
+    if (!isVideo && !isAudio && !isPhoto) {
+      toast.error(`"${f.name}" no es una foto, video ni audio.`);
+      return;
+    }
+    const maxMb = isVideo ? MAX_VIDEO_SIZE_MB : isAudio ? MAX_AUDIO_SIZE_MB : MAX_PHOTO_SIZE_MB;
+    if (f.size > maxMb * 1024 * 1024) {
+      toast.error(`"${f.name}" pesa demasiado (máximo ${maxMb} MB).`);
+      return;
+    }
+    setFile(f);
+  }
 
   async function load() {
     const { data } = await supabase.from("memories")
@@ -34,11 +72,13 @@ function MemoriesPage() {
       .eq("event_id", event.id).eq("moderation", "approved")
       .order("created_at", { ascending: false }).limit(80);
     setItems((data as Memory[]) ?? []);
+    setLoaded(true);
   }
   useEffect(() => { load(); }, [event.id]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (!memoriesEnabled) { toast.error("Los recuerdos están cerrados para este evento."); return; }
     const g = getGuest(event.id);
     if (!g) return toast.error("Primero unite al evento");
     if (!text.trim() && !file) return toast.error("Compartí algo");
@@ -71,25 +111,41 @@ function MemoriesPage() {
 
   return (
     <div className="space-y-6">
-      <form onSubmit={submit} className="space-y-4 rounded-3xl border bg-card p-6 shadow-soft">
-        <div>
-          <h2 className="font-display text-2xl">Dejá un recuerdo</h2>
-          <p className="text-sm text-muted-foreground">Un mensaje, una foto, un audio. Lo guardamos para siempre.</p>
+      {memoriesEnabled ? (
+        <form onSubmit={submit} className="space-y-4 rounded-3xl border bg-card p-6 shadow-soft">
+          <div>
+            <h2 className="font-display text-2xl">Dejá un recuerdo</h2>
+            <p className="text-sm text-muted-foreground">Un mensaje, una foto, un audio. Lo guardamos para siempre.</p>
+          </div>
+          <div>
+            <Label htmlFor="txt">Tu recuerdo</Label>
+            <Textarea id="txt" rows={3} value={text} onChange={(e) => setText(e.target.value)} maxLength={600} />
+          </div>
+          <div>
+            <Label htmlFor="mf">Adjuntá foto, video o audio</Label>
+            <Input id="mf" type="file" accept="image/*,video/*,audio/*" onChange={(e) => handleFile(e.target.files?.[0] ?? null)} />
+          </div>
+          <Button type="submit" disabled={saving} className="rounded-full bg-gradient-gold text-primary-foreground shadow-elegant transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:translate-y-0">
+            {saving ? "Enviando…" : "Compartir recuerdo"}
+          </Button>
+          <p className="text-xs text-muted-foreground">
+            Al compartir contenido confirmás que sos su autor/a o que contás con autorización para hacerlo. Ver{" "}
+            <Link to="/legal/terminos" className="underline underline-offset-2">Términos y Condiciones</Link>.
+          </p>
+        </form>
+      ) : (
+        <div className="rounded-3xl border bg-cream/40 p-6 text-center text-sm text-muted-foreground">
+          {event.status === "finished" ? "El evento finalizó — ya no se aceptan nuevos recuerdos." : "Los recuerdos están cerrados para este evento."}
         </div>
-        <div>
-          <Label htmlFor="txt">Tu recuerdo</Label>
-          <Textarea id="txt" rows={3} value={text} onChange={(e) => setText(e.target.value)} maxLength={600} />
-        </div>
-        <div>
-          <Label htmlFor="mf">Adjuntá foto, video o audio</Label>
-          <Input id="mf" type="file" accept="image/*,video/*,audio/*" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
-        </div>
-        <Button type="submit" disabled={saving} className="rounded-full bg-gradient-gold text-primary-foreground shadow-elegant transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:translate-y-0">
-          {saving ? "Enviando…" : "Compartir recuerdo"}
-        </Button>
-      </form>
+      )}
 
-      {items.length === 0 ? (
+      {!loaded ? (
+        <div className="grid gap-4 md:grid-cols-2">
+          {Array.from({ length: 2 }).map((_, i) => (
+            <div key={i} className="h-32 animate-pulse rounded-2xl bg-muted/40" />
+          ))}
+        </div>
+      ) : items.length === 0 ? (
         <div className="rounded-3xl border bg-cream/40 p-12 text-center">
           <Sparkles className="mx-auto h-10 w-10 text-muted-foreground" />
           <p className="mt-4 font-display text-2xl">Un lugar para lo que no querés olvidar</p>

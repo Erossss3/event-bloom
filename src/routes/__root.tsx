@@ -25,7 +25,7 @@ function NotFoundComponent() {
         <p className="mt-4 text-muted-foreground">Esta página no existe o el evento no está disponible.</p>
         <Link
           to="/"
-          className="mt-8 inline-flex items-center justify-center rounded-full bg-gradient-gold px-6 py-3 text-sm font-medium text-primary-foreground shadow-elegant transition-all hover:-translate-y-0.5 hover:shadow-lg"
+          className="mt-8 inline-flex items-center justify-center rounded-full bg-gradient-gold px-6 py-3 text-sm font-medium text-primary-foreground shadow-elegant transition-all hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           Volver al inicio
         </Link>
@@ -49,11 +49,11 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
             onClick={() => { router.invalidate(); reset(); }}
-            className="rounded-full bg-gradient-gold px-5 py-2 text-sm font-medium text-primary-foreground shadow-elegant transition-all hover:-translate-y-0.5 hover:shadow-lg"
+            className="rounded-full bg-gradient-gold px-5 py-2 text-sm font-medium text-primary-foreground shadow-elegant transition-all hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             Reintentar
           </button>
-          <a href="/" className="rounded-full border px-5 py-2 text-sm transition-colors hover:bg-accent">Inicio</a>
+          <a href="/" className="rounded-full border px-5 py-2 text-sm transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">Inicio</a>
         </div>
       </div>
     </div>
@@ -69,6 +69,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "Creá tu evento, invitá con QR y viví cada foto, mensaje y recuerdo en tiempo real. Casamientos, 15, cumpleaños y más." },
       { name: "theme-color", content: BRAND.themeColor },
       { name: "application-name", content: BRAND.name },
+      { name: "copyright", content: `© ${new Date().getFullYear()} ${BRAND.name}` },
       { name: "apple-mobile-web-app-title", content: BRAND.name },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { property: "og:site_name", content: BRAND.name },

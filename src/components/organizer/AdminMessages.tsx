@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Star, Trash2, MessageCircleHeart } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
@@ -9,6 +13,8 @@ interface Row { id: string; author_name: string; body: string; emoji: string | n
 
 export function AdminMessages({ eventId }: { eventId: string }) {
   const [rows, setRows] = useState<Row[]>([]);
+  const [toDelete, setToDelete] = useState<string | null>(null);
+
   async function load() {
     const { data } = await supabase.from("messages")
       .select("id, author_name, body, emoji, featured, created_at")
@@ -22,8 +28,8 @@ export function AdminMessages({ eventId }: { eventId: string }) {
     load();
   }
   async function remove(id: string) {
-    if (!confirm("¿Eliminar mensaje?")) return;
     await supabase.from("messages").delete().eq("id", id);
+    setToDelete(null);
     load();
   }
 
@@ -36,28 +42,48 @@ export function AdminMessages({ eventId }: { eventId: string }) {
   );
 
   return (
-    <ul className="space-y-3">
-      {rows.map((m) => (
-        <li key={m.id} className={`flex flex-col gap-3 rounded-xl border p-4 sm:flex-row sm:items-start ${m.featured ? "border-gold bg-gold-soft/30" : ""}`}>
-          <div className="flex-1 min-w-0">
-            <div className="flex flex-wrap items-center gap-2 text-sm">
-              <strong>{m.author_name}</strong>
-              <span className="text-xs text-muted-foreground">
-                {formatDistanceToNow(new Date(m.created_at), { addSuffix: true, locale: es })}
-              </span>
+    <>
+      <ul className="space-y-3">
+        {rows.map((m) => (
+          <li key={m.id} className={`flex flex-col gap-3 rounded-xl border p-4 sm:flex-row sm:items-start ${m.featured ? "border-gold bg-gold-soft/30" : ""}`}>
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-wrap items-center gap-2 text-sm">
+                <strong>{m.author_name}</strong>
+                <span className="text-xs text-muted-foreground">
+                  {formatDistanceToNow(new Date(m.created_at), { addSuffix: true, locale: es })}
+                </span>
+              </div>
+              <p className="mt-1 break-words">{m.emoji ? `${m.emoji} ` : ""}{m.body}</p>
             </div>
-            <p className="mt-1 break-words">{m.emoji ? `${m.emoji} ` : ""}{m.body}</p>
-          </div>
-          <div className="flex shrink-0 gap-2 self-end sm:self-start">
-            <Button size="sm" variant={m.featured ? "default" : "outline"} className="h-8 w-8 p-0" onClick={() => toggleFeatured(m.id, m.featured)}>
-              <Star className="h-3.5 w-3.5" />
-            </Button>
-            <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={() => remove(m.id)}>
-              <Trash2 className="h-3.5 w-3.5" />
-            </Button>
-          </div>
-        </li>
-      ))}
-    </ul>
+            <div className="flex shrink-0 gap-2 self-end sm:self-start">
+              <Button size="sm" variant={m.featured ? "default" : "outline"} className="h-8 w-8 p-0" onClick={() => toggleFeatured(m.id, m.featured)} aria-label={m.featured ? "Quitar de destacados" : "Destacar mensaje"}>
+                <Star className="h-3.5 w-3.5" />
+              </Button>
+              <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={() => setToDelete(m.id)} aria-label="Eliminar mensaje">
+                <Trash2 className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+          </li>
+        ))}
+      </ul>
+
+      <AlertDialog open={!!toDelete} onOpenChange={(open) => !open && setToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar este mensaje?</AlertDialogTitle>
+            <AlertDialogDescription>Esta acción no se puede deshacer.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="rounded-full">Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => toDelete && remove(toDelete)}
+              className="rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }

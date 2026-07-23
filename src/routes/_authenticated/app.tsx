@@ -31,7 +31,7 @@ function AppShell() {
     <div className="min-h-screen bg-background">
       <header className="border-b bg-background/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-          <Link to="/app" className="shrink-0"><LiveMomentsLogo className="h-10 md:h-14" /></Link>
+          <Link to="/app" className="shrink-0 rounded-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2"><LiveMomentsLogo className="h-10 md:h-14" /></Link>
           <nav className="flex items-center gap-1">
             {nav.map((n) => {
               const active = n.exact ? pathname === n.to : pathname.startsWith(n.to);
@@ -40,7 +40,9 @@ function AppShell() {
                   key={n.to}
                   to={n.to}
                   title={n.label}
-                  className={`inline-flex items-center gap-2 rounded-full px-2.5 py-2 text-sm transition-colors md:px-4 ${
+                  aria-label={n.label}
+                  aria-current={active ? "page" : undefined}
+                  className={`inline-flex items-center gap-2 rounded-full px-2.5 py-2 text-sm transition-colors md:px-4 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring ${
                     active ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
@@ -49,7 +51,7 @@ function AppShell() {
               );
             })}
           </nav>
-          <button onClick={signOut} title="Salir" className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground">
+          <button onClick={signOut} title="Salir" aria-label="Cerrar sesión" className="inline-flex items-center gap-2 rounded-full px-2 py-1 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
             <LogOut className="h-4 w-4" /> <span className="hidden md:inline">Salir</span>
           </button>
         </div>

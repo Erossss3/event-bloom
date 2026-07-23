@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { Camera, MessageCircleHeart, QrCode, Sparkles, ArrowRight, Play } from "lucide-react";
 import { LiveMomentsLogo } from "@/components/Logo";
+import { LegalFooter } from "@/components/legal/LegalFooter";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -17,17 +18,17 @@ const FEATURES = [
   { icon: QrCode, title: "Invitados con QR", desc: "Cada evento genera un QR único. Los invitados se unen escaneando, sin cuenta ni contraseñas." },
   { icon: Camera, title: "Galería colaborativa", desc: "Todos suben fotos y videos en tiempo real. Reacciones, moderación y pantalla en vivo para proyector." },
   { icon: MessageCircleHeart, title: "Mensajes y recuerdos", desc: "Un muro de emociones que queda guardado para siempre." },
-  { icon: Sparkles, title: "Video resumen", desc: "Al terminar el evento, generá un video con las mejores fotos y momentos elegidos por IA." },
+  { icon: Sparkles, title: "Video resumen", desc: "Al terminar el evento, generá un video con las mejores fotos y momentos del evento, en el estilo que elijas." },
 ];
 
 function LandingPage() {
   return (
     <div className="min-h-screen bg-background">
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-7">
-        <Link to="/"><LiveMomentsLogo className="h-12" /></Link>
+        <Link to="/" className="rounded-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"><LiveMomentsLogo className="h-12" /></Link>
         <nav className="flex items-center gap-3">
-          <Link to="/auth" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Ingresar</Link>
-          <Link to="/auth" className="rounded-full bg-foreground px-5 py-2 text-sm text-background transition-all hover:-translate-y-0.5 hover:opacity-90 hover:shadow-elegant">
+          <Link to="/auth" className="rounded-sm text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">Ingresar</Link>
+          <Link to="/auth" className="rounded-full bg-foreground px-5 py-2 text-sm text-background transition-all hover:-translate-y-0.5 hover:opacity-90 hover:shadow-elegant focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2">
             Empezar
           </Link>
         </nav>
@@ -52,11 +53,11 @@ function LandingPage() {
             <div className="mt-10 flex flex-wrap items-center gap-3">
               <Link
                 to="/auth"
-                className="inline-flex items-center gap-2 rounded-full bg-gradient-gold px-7 py-3.5 text-sm font-medium text-primary-foreground shadow-elegant transition-all hover:-translate-y-0.5 hover:opacity-95 hover:shadow-lg"
+                className="inline-flex items-center gap-2 rounded-full bg-gradient-gold px-7 py-3.5 text-sm font-medium text-primary-foreground shadow-elegant transition-all hover:-translate-y-0.5 hover:opacity-95 hover:shadow-lg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2"
               >
                 Crear mi evento <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
-              <a href="#como-funciona" className="inline-flex items-center gap-2 rounded-full border px-6 py-3.5 text-sm transition-colors hover:bg-accent">
+              <a href="#como-funciona" className="inline-flex items-center gap-2 rounded-full border px-6 py-3.5 text-sm transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2">
                 <Play className="h-4 w-4" /> Cómo funciona
               </a>
             </div>
@@ -98,15 +99,13 @@ function LandingPage() {
         </p>
         <Link
           to="/auth"
-          className="mt-8 inline-flex items-center gap-2 rounded-full bg-gradient-gold px-8 py-4 text-sm font-medium text-primary-foreground shadow-elegant transition-all hover:-translate-y-0.5 hover:shadow-lg"
+          className="mt-8 inline-flex items-center gap-2 rounded-full bg-gradient-gold px-8 py-4 text-sm font-medium text-primary-foreground shadow-elegant transition-all hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           Comenzar gratis <ArrowRight className="h-4 w-4" />
         </Link>
       </section>
 
-      <footer className="border-t py-8 text-center text-sm text-muted-foreground">
-        © {new Date().getFullYear()} LiveMoments
-      </footer>
+      <LegalFooter />
     </div>
   );
 }

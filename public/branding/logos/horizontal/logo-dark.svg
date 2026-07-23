@@ -7,12 +7,15 @@
     </linearGradient>
   </defs>
   <g transform="scale(0.52)">
-    <rect x="43" y="6" width="14" height="36" rx="7" fill="url(#lm-gold-h)" opacity="1" transform="rotate(0 50 50)"/>
-    <rect x="43" y="6" width="14" height="36" rx="7" fill="url(#lm-gold-h)" opacity="0.85" transform="rotate(60 50 50)"/>
-    <rect x="43" y="6" width="14" height="36" rx="7" fill="url(#lm-gold-h)" opacity="1" transform="rotate(120 50 50)"/>
-    <rect x="43" y="6" width="14" height="36" rx="7" fill="url(#lm-gold-h)" opacity="0.85" transform="rotate(180 50 50)"/>
-    <rect x="43" y="6" width="14" height="36" rx="7" fill="url(#lm-gold-h)" opacity="1" transform="rotate(240 50 50)"/>
-    <rect x="43" y="6" width="14" height="36" rx="7" fill="url(#lm-gold-h)" opacity="0.85" transform="rotate(300 50 50)"/>
+    <path d="M 93.72,54.98 A 44,44 0 0 1 76.17,85.37 L 64.18,59.38 A 17,17 0 0 0 66.53,46.03 Z" fill="url(#lm-gold-h)" opacity="1"/>
+    <path d="M 67.54,90.35 A 44,44 0 0 1 32.46,90.35 L 48.96,66.97 A 17,17 0 0 0 61.70,62.33 Z" fill="url(#lm-gold-h)" opacity="0.82"/>
+    <path d="M 23.83,85.37 A 44,44 0 0 1 6.28,54.98 L 34.79,57.59 A 17,17 0 0 0 45.17,66.30 Z" fill="url(#lm-gold-h)" opacity="1"/>
+    <path d="M 6.28,45.02 A 44,44 0 0 1 23.83,14.63 L 35.82,40.62 A 17,17 0 0 0 33.47,53.97 Z" fill="url(#lm-gold-h)" opacity="0.82"/>
+    <path d="M 32.46,9.65 A 44,44 0 0 1 67.54,9.65 L 51.04,33.03 A 17,17 0 0 0 38.30,37.67 Z" fill="url(#lm-gold-h)" opacity="1"/>
+    <path d="M 76.17,14.63 A 44,44 0 0 1 93.72,45.02 L 65.21,42.41 A 17,17 0 0 0 54.83,33.70 Z" fill="url(#lm-gold-h)" opacity="0.82"/>
   </g>
-  <text x="66" y="37" font-family="Inter, -apple-system, Segoe UI, Roboto, sans-serif" font-size="34" font-weight="700" letter-spacing="-0.5" fill="#241C12">LiveMoments</text>
+  <text x="66.0000" y="37" font-family="Inter, -apple-system, Segoe UI, Roboto, sans-serif" letter-spacing="-0.5"><tspan font-size="34" font-weight="700" fill="#241C12">L</tspan></text>
+  <rect x="86.2812" y="19.0000" width="4.4" height="18" rx="0.9" fill="#241C12"/>
+  <text x="92.2812" y="37" font-family="Inter, -apple-system, Segoe UI, Roboto, sans-serif" letter-spacing="-0.5"><tspan font-size="34" font-weight="700" fill="#241C12">ve</tspan><tspan font-size="34" font-weight="400" fill="#241C12">Moments</tspan></text>
+  <circle cx="88.4813" cy="14.5" r="2.8" fill="#D8A857"/>
 </svg>

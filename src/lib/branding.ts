@@ -11,6 +11,16 @@ export type LogoType = "horizontal" | "vertical" | "mark" | "wordmark";
 
 const base = "/branding";
 
+/**
+ * Se incrementa cada vez que cambian los assets de marca (favicons, app icons, manifest).
+ * Los navegadores cachean favicons de forma muy agresiva; este query param fuerza
+ * que se vuelvan a descargar en vez de servir la versión vieja desde caché.
+ */
+const BRAND_VERSION = "2";
+function v(path: string) {
+  return `${path}?v=${BRAND_VERSION}`;
+}
+
 export const BRAND = {
   name: "LiveMoments",
   tagline: "Viví y compartí cada evento",
@@ -36,29 +46,29 @@ export const BRAND = {
   } satisfies Record<LogoType, Record<LogoVariant, string>>,
 
   favicon: {
-    ico: `${base}/favicon/favicon.ico`,
-    png16: `${base}/favicon/favicon-16x16.png`,
-    png32: `${base}/favicon/favicon-32x32.png`,
-    png48: `${base}/favicon/favicon-48x48.png`,
-    png64: `${base}/favicon/favicon-64x64.png`,
-    png128: `${base}/favicon/favicon-128x128.png`,
-    png256: `${base}/favicon/favicon-256x256.png`,
-    png512: `${base}/favicon/favicon-512x512.png`,
+    ico: v(`${base}/favicon/favicon.ico`),
+    png16: v(`${base}/favicon/favicon-16x16.png`),
+    png32: v(`${base}/favicon/favicon-32x32.png`),
+    png48: v(`${base}/favicon/favicon-48x48.png`),
+    png64: v(`${base}/favicon/favicon-64x64.png`),
+    png128: v(`${base}/favicon/favicon-128x128.png`),
+    png256: v(`${base}/favicon/favicon-256x256.png`),
+    png512: v(`${base}/favicon/favicon-512x512.png`),
   },
 
   app: {
-    androidChrome192: `${base}/app/android-chrome-192x192.png`,
-    androidChrome512: `${base}/app/android-chrome-512x512.png`,
-    appleTouchIcon180: `${base}/app/apple-touch-icon-180x180.png`,
-    appIcon1024: `${base}/app/app-icon-1024x1024.png`,
+    androidChrome192: v(`${base}/app/android-chrome-192x192.png`),
+    androidChrome512: v(`${base}/app/android-chrome-512x512.png`),
+    appleTouchIcon180: v(`${base}/app/apple-touch-icon-180x180.png`),
+    appIcon1024: v(`${base}/app/app-icon-1024x1024.png`),
   },
 
   social: {
-    ogImage: `${base}/social/og-image-1200x630.png`,
-    twitterCard: `${base}/social/twitter-card-1200x600.png`,
+    ogImage: v(`${base}/social/og-image-1200x630.png`),
+    twitterCard: v(`${base}/social/twitter-card-1200x600.png`),
   },
 
-  manifest: `${base}/site.webmanifest`,
+  manifest: v(`${base}/site.webmanifest`),
 };
 
 /** Devuelve la ruta del logo pedido. Uso: logoSrc("horizontal", "dark") */

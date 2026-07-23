@@ -3,7 +3,7 @@ import { CountdownTimer } from "@/components/CountdownTimer";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { motion } from "framer-motion";
-import { Camera, Heart, MapPin, MessageCircle } from "lucide-react";
+import { Camera, MapPin, MessageCircle } from "lucide-react";
 import { getRouteApi } from "@tanstack/react-router";
 
 const layoutApi = getRouteApi("/e/$slug");
@@ -16,50 +16,70 @@ function EventHome() {
   const { slug } = useParams({ from: "/e/$slug/" });
   const { event } = layoutApi.useLoaderData();
 
-  return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
-      {event.description && (
-        <p className="text-lg leading-relaxed text-foreground/80">{event.description}</p>
-      )}
+  const hasLocation = event.location_name || event.location_address;
 
-      <div className="rounded-3xl border bg-gradient-hero p-6 shadow-soft">
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="space-y-10">
+      {/* Fecha y lugar son la misma categoría de información ("sobre el
+          evento") — antes vivían en dos tarjetas separadas y apiladas; ahora
+          es una sola, con un divisor sutil entre ambas partes en vez de dos
+          bordes distintos compitiendo por atención. */}
+      <div className="rounded-3xl border bg-gradient-hero p-6 shadow-soft sm:p-8">
         <p className="text-xs uppercase tracking-[0.3em] text-gold">Cuenta regresiva</p>
         <CountdownTimer target={event.starts_at} />
-        <p className="mt-3 text-sm text-muted-foreground">
+        <p className="mt-4 text-sm text-muted-foreground">
           {format(new Date(event.starts_at), "EEEE d 'de' MMMM 'de' yyyy · HH:mm", { locale: es })}
         </p>
+
+        {hasLocation && (
+          <div className="mt-6 border-t border-foreground/10 pt-6">
+            <p className="flex items-center gap-2 font-display text-lg text-foreground/90">
+              <MapPin className="h-4 w-4 shrink-0 text-gold" /> {event.location_name}
+            </p>
+            {event.location_address && <p className="mt-1 text-sm text-muted-foreground">{event.location_address}</p>}
+            {event.location_address && (
+              <a
+                target="_blank"
+                rel="noreferrer"
+                href={`https://maps.google.com/?q=${encodeURIComponent(event.location_address)}`}
+                className="mt-4 inline-flex rounded-full border border-foreground/15 px-4 py-2 text-sm transition-colors hover:bg-foreground/5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              >
+                Ver en mapas
+              </a>
+            )}
+          </div>
+        )}
       </div>
 
-      {(event.location_name || event.location_address) && (
-        <div className="rounded-3xl border bg-card p-6 shadow-soft">
-          <h3 className="font-display text-2xl">Lugar</h3>
-          <p className="mt-2 flex items-center gap-2 text-foreground/80"><MapPin className="h-4 w-4" /> {event.location_name}</p>
-          {event.location_address && <p className="mt-1 text-sm text-muted-foreground">{event.location_address}</p>}
-          {event.location_address && (
-            <a target="_blank" rel="noreferrer"
-              href={`https://maps.google.com/?q=${encodeURIComponent(event.location_address)}`}
-              className="mt-4 inline-flex rounded-full border px-4 py-2 text-sm hover:bg-accent">
-              Ver en mapas
-            </a>
-          )}
-        </div>
-      )}
+      {/* Prioridad visual: 1) subir recuerdos / ver álbum (misma pantalla,
+          es la acción central de LiveMoments), 2) dejar un mensaje,
+          3) confirmar asistencia — antes las tres competían con el mismo
+          peso, ahora hay una sola protagonista. */}
+      <div className="space-y-3">
+        <Link
+          to="/e/$slug/gallery"
+          params={{ slug }}
+          className="group flex items-center justify-between gap-4 rounded-3xl bg-gradient-gold p-7 text-primary-foreground shadow-elegant transition-all hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        >
+          <div>
+            <p className="text-xs uppercase tracking-[0.3em] opacity-80">La foto es el recuerdo</p>
+            <p className="mt-1 font-display text-2xl">Subí y mirá el álbum</p>
+          </div>
+          <Camera className="h-8 w-8 shrink-0 opacity-90 transition-transform group-hover:scale-110" />
+        </Link>
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        <ActionCard slug={slug} to="/e/$slug/gallery" icon={Camera} label="Fotos & videos" />
-        <ActionCard slug={slug} to="/e/$slug/messages" icon={MessageCircle} label="Dejar un mensaje" />
+        <Link
+          to="/e/$slug/messages"
+          params={{ slug }}
+          className="group flex items-center gap-4 rounded-2xl border bg-card p-5 shadow-soft transition hover:-translate-y-0.5 hover:shadow-elegant focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        >
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-gold text-primary-foreground">
+            <MessageCircle className="h-5 w-5" />
+          </div>
+          <p className="font-medium">Dejale un mensaje</p>
+        </Link>
+
       </div>
     </motion.div>
-  );
-}
-
-function ActionCard({ slug, to, icon: Icon, label }: { slug: string; to: "/e/$slug/rsvp" | "/e/$slug/gallery" | "/e/$slug/messages"; icon: React.ComponentType<{className?: string}>; label: string }) {
-  return (
-    <Link to={to} params={{ slug }} className="group rounded-2xl border bg-card p-5 text-center shadow-soft transition hover:-translate-y-0.5 hover:shadow-elegant">
-      <div className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-gold text-primary-foreground">
-        <Icon className="h-5 w-5" />
-      </div>
-      <p className="mt-3 font-medium">{label}</p>
-    </Link>
   );
 }

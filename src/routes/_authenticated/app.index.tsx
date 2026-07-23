@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouteContext } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
@@ -12,12 +12,15 @@ export const Route = createFileRoute("/_authenticated/app/")({
 });
 
 function DashboardPage() {
+  const { user } = useRouteContext({ from: "/_authenticated" });
+
   const { data: events, isLoading } = useQuery({
-    queryKey: ["my-events"],
+    queryKey: ["my-events", user.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("events")
         .select("*")
+        .eq("owner_id", user.id)
         .order("starts_at", { ascending: false });
       if (error) throw error;
       return data ?? [];
@@ -34,7 +37,7 @@ function DashboardPage() {
         </div>
         <Link
           to="/app/events/new"
-          className="inline-flex items-center gap-2 rounded-full bg-gradient-gold px-5 py-3 text-sm font-medium text-primary-foreground shadow-elegant transition-all hover:-translate-y-0.5 hover:shadow-lg"
+          className="inline-flex items-center gap-2 rounded-full bg-gradient-gold px-5 py-3 text-sm font-medium text-primary-foreground shadow-elegant transition-all hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           <PlusCircle className="h-4 w-4" /> Crear evento
         </Link>
@@ -49,7 +52,7 @@ function DashboardPage() {
             <Calendar className="mx-auto h-10 w-10 text-muted-foreground" />
             <h3 className="mt-4 font-display text-2xl">Aún no tenés eventos</h3>
             <p className="mt-2 text-sm text-muted-foreground">Empezá creando tu primer evento. Toma menos de 2 minutos.</p>
-            <Link to="/app/events/new" className="mt-6 inline-flex items-center gap-2 rounded-full bg-foreground px-6 py-3 text-sm text-background transition-opacity hover:opacity-90">
+            <Link to="/app/events/new" className="mt-6 inline-flex items-center gap-2 rounded-full bg-foreground px-6 py-3 text-sm text-background transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2">
               <PlusCircle className="h-4 w-4" /> Crear mi primer evento
             </Link>
           </div>
@@ -85,16 +88,25 @@ function DashboardPage() {
                 )}
               </div>
               <div className="mt-5 flex flex-wrap gap-2">
-                <Link to="/app/events/$id" params={{ id: e.id }} className="rounded-full bg-foreground px-4 py-1.5 text-xs text-background">
+                <Link
+                  to="/app/events/$id"
+                  params={{ id: e.id }}
+                  className="rounded-full bg-foreground px-4 py-1.5 text-xs text-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2"
+                >
                   Administrar
                 </Link>
-                <Link to="/e/$slug" params={{ slug: e.slug }} className="inline-flex items-center gap-1 rounded-full border px-4 py-1.5 text-xs">
+                <Link
+                  to="/e/$slug"
+                  params={{ slug: e.slug }}
+                  className="inline-flex items-center gap-1 rounded-full border px-4 py-1.5 text-xs transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                >
                   <Users className="h-3 w-3" /> Página pública
                 </Link>
                 <Link
-                  to="/app/events/$id" 
+                  to="/app/events/$id"
                   params={{ id: e.id }}
-                  className="inline-flex items-center gap-1 rounded-full border px-4 py-1.5 text-xs"
+                  search={{ qr: true }}
+                  className="inline-flex items-center gap-1 rounded-full border px-4 py-1.5 text-xs transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 >
                   <QrCode className="h-3 w-3" /> QR
                 </Link>

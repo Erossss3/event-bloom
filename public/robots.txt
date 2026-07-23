@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /$
+Allow: /legal/
+Disallow: /app
+Disallow: /auth
+Disallow: /e/
+Disallow: /r/
+
+Sitemap: https://livemoments-ruddy.vercel.app/sitemap.xml

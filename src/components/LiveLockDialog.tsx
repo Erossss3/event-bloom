@@ -9,7 +9,7 @@ export function LiveLockDialog({ open, target }: Props) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999]">
+    <div className="fixed inset-0 z-[9999]" role="dialog" aria-modal="true" aria-live="polite" aria-label="La pantalla en vivo todavía no está disponible">
       {/* Fondo oscuro + blur */}
       <div className="absolute inset-0 bg-black/50 backdrop-blur-md" />
 

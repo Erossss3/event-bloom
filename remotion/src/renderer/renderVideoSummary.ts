@@ -94,6 +94,7 @@ export function renderVideoSummary(
       composition,
       serveUrl: bundleUrl,
       codec: "h264",
+      concurrency: 1,
       outputLocation: outputPath,
       inputProps: validatedProps,
       cancelSignal,

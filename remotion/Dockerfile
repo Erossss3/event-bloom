@@ -12,7 +12,7 @@
 # documentación oficial de la versión de @remotion/renderer que quede
 # resuelta (no pude instalar ni construir esta imagen en este entorno para
 # confirmarlo).
-FROM node:20-bookworm-slim
+FROM node:22-bookworm-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \

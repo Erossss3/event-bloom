@@ -68,7 +68,17 @@ export function runWorker(options: RunWorkerOptions = {}): WorkerHandle {
       try {
         attempt = await pollAndProcessOnce(pollOptions);
       } catch (err) {
-        onLog(`[video-worker#${laneId}] error de infraestructura, reintentando en ${errorBackoffMs}ms: ${String(err)}`);
+        const detail =
+          err instanceof Error
+            ? err.message
+            : (() => {
+                try {
+                  return JSON.stringify(err);
+                } catch {
+                  return String(err);
+                }
+              })();
+        onLog(`[video-worker#${laneId}] error de infraestructura, reintentando en ${errorBackoffMs}ms: ${detail}`);
         await sleep(errorBackoffMs);
         continue;
       }

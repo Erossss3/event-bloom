@@ -1,6 +1,7 @@
 import { unlink } from "node:fs/promises";
 import type { RenderJobInput, RenderJobResult } from "./types";
 import { fetchEventData } from "./fetchEventData";
+import { resizeGalleryPhotos } from "./resizePhotos";
 import { renderVideoSummary } from "./renderVideoSummary";
 import { uploadRenderedVideo } from "./uploadToSupabase";
 import { getSupabaseAdminClient } from "./supabaseAdmin";
@@ -92,10 +93,15 @@ export async function processVideoJob(job: RenderJobInput): Promise<RenderJobRes
       }
       console.log(`[video-worker] job ${job.videoId}: heartbeat inicial ok`);
 
-      const inputProps = await fetchEventData(job);
+      const rawInputProps = await fetchEventData(job);
       console.log(
-        `[video-worker] job ${job.videoId}: datos del evento cargados (${inputProps.photos.length} fotos, ${inputProps.messages.length} mensajes)`,
+        `[video-worker] job ${job.videoId}: datos del evento cargados (${rawInputProps.photos.length} fotos, ${rawInputProps.messages.length} mensajes)`,
       );
+
+      console.log(`[video-worker] job ${job.videoId}: redimensionando fotos...`);
+      const resizedPhotos = await resizeGalleryPhotos(rawInputProps.photos);
+      const inputProps = { ...rawInputProps, photos: resizedPhotos };
+      console.log(`[video-worker] job ${job.videoId}: fotos redimensionadas`);
 
     let lastHeartbeatAt = 0;
     const handle = renderVideoSummary(job.videoId, inputProps, (progress) => {
@@ -163,15 +169,31 @@ export async function processVideoJob(job: RenderJobInput): Promise<RenderJobRes
     const errorMessage = err instanceof Error ? err.message : "Error desconocido durante el render";
     console.error(`[video-worker] job ${job.videoId}: FALLÓ — ${errorMessage}`);
 
-    const { error: failError } = await supabase.rpc("mark_video_failed", {
-      p_video_id: job.videoId,
-      p_error_message: errorMessage,
-    });
+    // Reintenta un par de veces con backoff corto: justo después de un
+    // render que murió por falta de memoria, el proceso Node (y su cliente
+    // de Supabase) puede seguir bajo la misma presión de memoria durante
+    // uno o dos segundos más, y esta llamada puede fallar en el primer
+    // intento por eso. Sin este reintento, la fila quedaba en 'processing'
+    // hasta que reap_stale_video_jobs() la liberaba (hasta 90s después) —
+    // ventana en la que un reintento del usuario chocaba con
+    // idx_videos_active_unique y mostraba el toast de "ya hay un video en
+    // cola/procesando".
+    let failError: { message: string } | null = null;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      const { error } = await supabase.rpc("mark_video_failed", {
+        p_video_id: job.videoId,
+        p_error_message: errorMessage,
+      });
+      failError = error;
+      if (!failError || looksLikeRowNoLongerClaimable(failError.message)) break;
+      if (attempt < 3) await new Promise((resolve) => setTimeout(resolve, attempt * 1000));
+    }
     if (failError && !looksLikeRowNoLongerClaimable(failError.message)) {
-      // Si ni siquiera se pudo dejar constancia del fallo (y no es porque
-      // ya estaba cancelado/reapeado), es un problema de conectividad con
-      // Supabase en sí — se relanza para que el worker lo loguee como un
-      // error de infraestructura, no como un fallo silencioso del job.
+      // Si ni siquiera se pudo dejar constancia del fallo tras los
+      // reintentos (y no es porque ya estaba cancelado/reapeado), es un
+      // problema de conectividad con Supabase en sí — se relanza para que
+      // el worker lo loguee como un error de infraestructura, no como un
+      // fallo silencioso del job.
       throw failError;
     }
 

@@ -22,7 +22,7 @@ const DURATIONS: { seconds: number; label: string }[] = [
   { seconds: 90, label: "Extendido · 90s" },
 ];
 
-type VideoStatus = "pending" | "processing" | "ready" | "failed" | "cancelled";
+type VideoStatus = "queued" | "processing" | "completed" | "failed" | "cancelled";
 
 interface VideoRow {
   id: string;
@@ -35,17 +35,17 @@ interface VideoRow {
 } 
 
 const STATUS_LABEL: Record<VideoStatus, string> = {
-  pending: "En cola",
+  queued: "En cola",
   processing: "Generando",
-  ready: "Listo",
+  completed: "Listo",
   failed: "Falló",
   cancelled: "Cancelado",
 };
 
 const STATUS_STYLE: Record<VideoStatus, string> = {
-  pending: "bg-muted text-muted-foreground",
+  queued: "bg-muted text-muted-foreground",
   processing: "bg-gold/15 text-gold border border-gold/40",
-  ready: "bg-accent text-accent-foreground",
+  completed: "bg-accent text-accent-foreground",
   failed: "bg-destructive/10 text-destructive",
   cancelled: "bg-muted text-muted-foreground",
 };
@@ -104,6 +104,15 @@ export function VideoSummarySection({ eventId, finished }: { eventId: string; sl
       if (error) throw error;
     },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["videos", eventId] }); toast.success("Reintentando"); },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Error"),
+  });
+
+  const remove = useMutation({
+    mutationFn: async (videoId: string) => {
+      const { error } = await (supabase.rpc as any)("delete_video_summary", { p_video_id: videoId });
+      if (error) throw error;
+    },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["videos", eventId] }); toast.success("Video borrado"); },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Error"),
   });
 
@@ -216,7 +225,7 @@ export function VideoSummarySection({ eventId, finished }: { eventId: string; sl
                 )}
               </div>
               <div className="flex gap-2">
-                {(v.status === "pending" || v.status === "processing") && (
+                {(v.status === "queued" || v.status === "processing") && (
                   <button type="button" onClick={() => cancel.mutate(v.id)} disabled={cancel.isPending}
                     className="inline-flex items-center gap-1 rounded-full border px-4 py-2 text-xs">
                     <X className="h-3 w-3" /> Cancelar
@@ -228,7 +237,13 @@ export function VideoSummarySection({ eventId, finished }: { eventId: string; sl
                     <RotateCcw className="h-3 w-3" /> Reintentar
                   </button>
                 )}
-                {v.status === "ready" && (
+                {(v.status === "failed" || v.status === "completed") && (
+                  <button type="button" onClick={() => { if (confirm("¿Borrar este video? No se puede deshacer.")) remove.mutate(v.id); }} disabled={remove.isPending}
+                    className="inline-flex items-center gap-1 rounded-full border border-destructive/40 px-4 py-2 text-xs text-destructive">
+                    <X className="h-3 w-3" /> Borrar
+                  </button>
+                )}
+                {v.status === "completed" && (
                   <>
                     <button type="button" onClick={() => downloadOrShare(v, "download")}
                       className="inline-flex items-center gap-1 rounded-full bg-foreground px-4 py-2 text-xs text-background">

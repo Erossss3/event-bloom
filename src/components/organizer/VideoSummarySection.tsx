@@ -2,9 +2,31 @@ import { Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Sparkles, Download, Share2, Loader2, Wand2, X, RotateCcw, AlertTriangle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+
+/** El error que devuelve supabase.rpc() no siempre es una instancia real de
+ * Error (según la versión, puede llegar como un objeto plano
+ * {message, details, hint, code}) — `e instanceof Error` fallaba en ese
+ * caso y el toast mostraba "Error" a secas, sin el mensaje real. */
+function errorMessage(e: unknown): string {
+  if (e instanceof Error) return e.message;
+  if (e && typeof e === "object" && "message" in e && typeof (e as { message: unknown }).message === "string") {
+    return (e as { message: string }).message;
+  }
+  return "Error";
+}
 
 // Los 4 estilos premium de LiveMoments. La estética/ritmo real de cada uno
 // se define en la composición de Remotion (remotion/src/styles/*.ts) — acá solo
@@ -54,6 +76,7 @@ export function VideoSummarySection({ eventId, finished }: { eventId: string; sl
   const qc = useQueryClient();
   const [selected, setSelected] = useState<string>("cinematic");
   const [duration, setDuration] = useState<number>(60);
+  const [deleteTarget, setDeleteTarget] = useState<VideoRow | null>(null);
 
   const { data: videos } = useQuery({
     queryKey: ["videos", eventId],
@@ -86,7 +109,7 @@ export function VideoSummarySection({ eventId, finished }: { eventId: string; sl
       return data;
     },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["videos", eventId] }); toast.success("Video resumen en cola"); },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Error"),
+    onError: (e) => toast.error(errorMessage(e)),
   });
 
   const cancel = useMutation({
@@ -95,7 +118,7 @@ export function VideoSummarySection({ eventId, finished }: { eventId: string; sl
       if (error) throw error;
     },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["videos", eventId] }); toast.success("Job cancelado"); },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Error"),
+    onError: (e) => toast.error(errorMessage(e)),
   });
 
   const retry = useMutation({
@@ -104,7 +127,7 @@ export function VideoSummarySection({ eventId, finished }: { eventId: string; sl
       if (error) throw error;
     },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["videos", eventId] }); toast.success("Reintentando"); },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Error"),
+    onError: (e) => toast.error(errorMessage(e)),
   });
 
   const remove = useMutation({
@@ -112,8 +135,12 @@ export function VideoSummarySection({ eventId, finished }: { eventId: string; sl
       const { error } = await (supabase.rpc as any)("delete_video_summary", { p_video_id: videoId });
       if (error) throw error;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["videos", eventId] }); toast.success("Video borrado"); },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Error"),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["videos", eventId] });
+      toast.success("Video borrado");
+      setDeleteTarget(null);
+    },
+    onError: (e) => toast.error(errorMessage(e)),
   });
 
   async function downloadOrShare(video: VideoRow, action: "download" | "share") {
@@ -122,22 +149,41 @@ export function VideoSummarySection({ eventId, finished }: { eventId: string; sl
       return;
     }
 
-    try {
-      const url = video.video_url;
+    const url = video.video_url;
 
-      if (action === "download") {
+    if (action === "download") {
+      // El navegador ignora el atributo download de <a> cuando la URL es de
+      // otro dominio (Supabase Storage vive en *.supabase.co, no en el
+      // dominio de la app) — por eso terminaba navegando directo al video
+      // en vez de descargarlo. Bajándolo como blob y descargando ESE blob
+      // (que sí es same-origin) se fuerza la descarga real.
+      const toastId = toast.loading("Descargando...");
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`No se pudo descargar (${response.status})`);
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
         const a = document.createElement("a");
-        a.href = url;
+        a.href = blobUrl;
         a.download = `resumen-${video.style}.mp4`;
         a.click();
-      } else if (navigator.share) {
+        URL.revokeObjectURL(blobUrl);
+        toast.success("Descarga iniciada", { id: toastId });
+      } catch (err) {
+        toast.error(errorMessage(err) || "No pudimos descargar el video", { id: toastId });
+      }
+      return;
+    }
+
+    try {
+      if (navigator.share) {
         await navigator.share({ title: "Video resumen", url });
       } else {
         await navigator.clipboard.writeText(url);
         toast.success("Link copiado");
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "No pudimos generar el link");
+      toast.error(errorMessage(err) || "No pudimos generar el link");
     }
   }
 
@@ -238,7 +284,7 @@ export function VideoSummarySection({ eventId, finished }: { eventId: string; sl
                   </button>
                 )}
                 {(v.status === "failed" || v.status === "completed") && (
-                  <button type="button" onClick={() => { if (confirm("¿Borrar este video? No se puede deshacer.")) remove.mutate(v.id); }} disabled={remove.isPending}
+                  <button type="button" onClick={() => setDeleteTarget(v)} disabled={remove.isPending}
                     className="inline-flex items-center gap-1 rounded-full border border-destructive/40 px-4 py-2 text-xs text-destructive">
                     <X className="h-3 w-3" /> Borrar
                   </button>
@@ -260,6 +306,31 @@ export function VideoSummarySection({ eventId, finished }: { eventId: string; sl
           ))}
         </ul>
       )}
+
+      <AlertDialog open={deleteTarget !== null} onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Borrar este video?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {deleteTarget && (
+                <>El resumen <span className="font-medium capitalize">{deleteTarget.style}</span> se va a borrar
+                  para siempre. Esta acción no se puede deshacer.</>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={remove.isPending} className="rounded-full">Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={remove.isPending}
+              onClick={() => { if (deleteTarget) remove.mutate(deleteTarget.id); }}
+              className="rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {remove.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              Borrar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

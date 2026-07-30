@@ -98,6 +98,16 @@ export function renderVideoSummary(
       outputLocation: outputPath,
       inputProps: validatedProps,
       cancelSignal,
+      // --- Ajustado para un plan de Railway con techo de 1GB de RAM ---
+      // Los valores de acá abajo son deliberadamente agresivos porque no
+      // hay margen: en un plan con más RAM disponible, subirlos (o
+      // sacarlos y dejar que Remotion use sus defaults) da mejor calidad
+      // y velocidad de encode con menos riesgo de artefactos por el
+      // preset rápido de x264.
+      offthreadVideoCacheSizeInBytes: 150 * 1024 * 1024, // antes 512MB
+      mediaCacheSizeInBytes: 100 * 1024 * 1024,
+      offthreadVideoThreads: 1,
+      x264Preset: "veryfast", // usa mucho menos lookahead/análisis interno que "medium" (el default)
       onProgress: onProgress
         ? ({ progress }) => {
             const percent = Math.round(progress * 100);

@@ -1,10 +1,16 @@
 import { Composition } from "remotion";
 import { VideoSummary } from "./compositions/VideoSummary";
+import { videoSummaryInputPropsSchema } from "./lib/assertProps";
 import type { VideoSummaryInputProps } from "./types";
 
 const FPS = 30;
-const WIDTH = 1920;
-const HEIGHT = 1080;
+// Bajado de 1920x1080 a 1280x720 para entrar en un plan de Railway con
+// techo de 1GB de RAM: la cuenta de píxeles por frame queda en ~44% de la
+// original, que es la reducción de memoria de mayor impacto disponible sin
+// tocar la arquitectura del render. Si en algún momento se sube el plan de
+// Railway (2GB+), este es el primer valor a revertir a 1920x1080.
+const WIDTH = 1280;
+const HEIGHT = 720;
 
 /**
  * defaultProps es un campo obligatorio de <Composition> (lo exige la API de
@@ -28,9 +34,10 @@ const defaultProps: VideoSummaryInputProps = {
 export function Root() {
   return (
     <>
-      <Composition
+      <Composition<typeof videoSummaryInputPropsSchema, VideoSummaryInputProps>
         id="VideoSummary"
         component={VideoSummary}
+        schema={videoSummaryInputPropsSchema}
         fps={FPS}
         width={WIDTH}
         height={HEIGHT}
